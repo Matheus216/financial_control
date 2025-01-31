@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "financial-control", "financial-control\financial-control.csproj", "{2BB5ABFA-3D17-4BDF-8AFB-2587DA4A36FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "financial-control-test", "financial-control-test\financial-control-test.csproj", "{D60AD0F2-25D1-4903-9CCC-70AF94E16DC2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2BB5ABFA-3D17-4BDF-8AFB-2587DA4A36FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BB5ABFA-3D17-4BDF-8AFB-2587DA4A36FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BB5ABFA-3D17-4BDF-8AFB-2587DA4A36FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BB5ABFA-3D17-4BDF-8AFB-2587DA4A36FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D60AD0F2-25D1-4903-9CCC-70AF94E16DC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D60AD0F2-25D1-4903-9CCC-70AF94E16DC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D60AD0F2-25D1-4903-9CCC-70AF94E16DC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D60AD0F2-25D1-4903-9CCC-70AF94E16DC2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
