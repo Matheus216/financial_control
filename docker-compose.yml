@@ -10,3 +10,11 @@ services:
       dockerfile: financial-control/Dockerfile
     ports:
       - 5044:5044
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: financialcontrol
+    ports:
+      - 5432:5432
