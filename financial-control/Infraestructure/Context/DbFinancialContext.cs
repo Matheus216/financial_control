@@ -1,13 +1,21 @@
 using financial_control.Infraestructure.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace financial_control.Infraestructure.Context;
 
 public class DbFinancialContext : DbContext
 {
-    public DbFinancialContext(DbContextOptionsBuilder options, IConfiguration _configuration) 
+    private readonly IConfiguration _configuration;
+
+    public DbFinancialContext(IConfiguration configuration)
     {
-        options.UseNpgsql(_configuration.GetConnectionString("DbFinancial"));
+        _configuration = configuration;
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    {
+        options.UseNpgsql("Host=localhost;Port=5432;Database=DbFinancial;Username=admin;Password=admin");
     }
 
     public DbSet<FinancialModel> Financial { get; set; }
