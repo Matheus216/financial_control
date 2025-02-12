@@ -4,6 +4,7 @@ EXPOSE 5044
 
 ENV ASPNETCORE_URLS=http://+:5044
 
+
 USER app
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG configuration=Release
@@ -12,7 +13,9 @@ COPY ["financial-control/financial-control.csproj", "financial-control/"]
 RUN dotnet restore "financial-control/financial-control.csproj"
 COPY . .
 WORKDIR "/src/financial-control"
-RUN dotnet build "financial-control.csproj" -c $configuration -o /app/build
+
+ENV PATH="$PATH:/root/.dotnet/tools"
+RUN dotnet tool install --global dotnet-ef
 
 FROM build AS publish
 ARG configuration=Release

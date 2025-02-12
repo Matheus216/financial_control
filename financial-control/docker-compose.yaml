@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  app:
+    environment:
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_RUNNING_IN_CONTAINER=true
+      - DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE=false
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+      - "9229:9229" # Port for debugging
+    volumes:
+      - .:/app
+      - ~/.vsdbg:/root/.vsdbg # Debugger
+    command: ["dotnet", "watch", "run", "--no-launch-profile"]
