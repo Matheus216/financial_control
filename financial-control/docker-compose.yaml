@@ -1,6 +1,18 @@
-version: '3.8'
 services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: financialcontrol
+    ports:
+      - 5432:5432
+    networks:
+      - financialNetwork
   app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     environment:
       - DOTNET_USE_POLLING_FILE_WATCHER=1
       - ASPNETCORE_ENVIRONMENT=Development
@@ -14,3 +26,8 @@ services:
       - .:/app
       - ~/.vsdbg:/root/.vsdbg # Debugger
     command: ["dotnet", "watch", "run", "--no-launch-profile"]
+    depends_on:
+      - postgres
+networks:
+  financialNetwork:
+    driver: bridge

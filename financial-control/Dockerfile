@@ -1,27 +1,21 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
-EXPOSE 5044
 
-ENV ASPNETCORE_URLS=http://+:5044
-
-
-USER app
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG configuration=Release
-WORKDIR /src
-COPY ["financial-control/financial-control.csproj", "financial-control/"]
-RUN dotnet restore "financial-control/financial-control.csproj"
 COPY . .
-WORKDIR "/src/financial-control"
 
-ENV PATH="$PATH:/root/.dotnet/tools"
-RUN dotnet tool install --global dotnet-ef
+RUN dotnet restore
 
-FROM build AS publish
-ARG configuration=Release
-RUN dotnet publish "financial-control.csproj" -c $configuration -o /app/publish /p:UseAppHost=false
+RUN dotnet publish -c Release -o /publish --no-restore
 
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+COPY --from=build /publish .
+
+EXPOSE 8080
+
+ENV ASPNETCORE_URLS=http://+:8080
+
+RUN export PATH=$PATH:/home/app/.dotnet/tools
+
 ENTRYPOINT ["dotnet", "financial-control.dll"]
