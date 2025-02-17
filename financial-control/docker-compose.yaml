@@ -2,14 +2,20 @@ services:
   postgres:
     image: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: financialcontrol
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: DbFinancial
     ports:
       - 5432:5432
     networks:
       - financialNetwork
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user"]
+      interval: 5s 
+      retries: 5
+      timeout: 10s
   app:
+    image: letodev/financial-image
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -21,13 +27,16 @@ services:
     ports:
       - "5000:5000"
       - "5001:5001"
-      - "9229:9229" # Port for debugging
+      - "8080:8080" # Port for debugging
     volumes:
       - .:/app
       - ~/.vsdbg:/root/.vsdbg # Debugger
     command: ["dotnet", "watch", "run", "--no-launch-profile"]
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    networks:
+      - financialNetwork
 networks:
   financialNetwork:
     driver: bridge

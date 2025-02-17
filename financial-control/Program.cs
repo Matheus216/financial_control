@@ -22,6 +22,8 @@ app.UseSwaggerUI();
 app.MapControllers();
 app.UseHttpsRedirection();
 
+app.InitializeMigration();
+
 app.Run();
 
 
