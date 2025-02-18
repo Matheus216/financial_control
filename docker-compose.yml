@@ -1,20 +1,38 @@
-# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
-
-version: '3.4'
-
 services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: financialcontrol
+    ports:
+      - 5432:5432
+    networks:
+      - financialcontrol
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
   financialcontrol:
     image: financialcontrol
     build:
       context: .
       dockerfile: financial-control/Dockerfile
+      args:
+        - configuration=Debug
     ports:
       - 5044:5044
-  db:
-    image: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: financialcontrol
-    ports:
-      - 5432:5432
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - financialcontrol
+networks:
+  financialcontrol:
+    driver: bridge

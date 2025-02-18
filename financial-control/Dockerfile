@@ -1,18 +1,24 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:35792ea4ad1db051981f62b313f1be3b46b1f45cadbaa3c288cd0d3056eefb83 AS build
-WORKDIR /App
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 5044
 
-EXPOSE 80
-ENV ASPNETCORE_URLS=http://+:80
+ENV ASPNETCORE_URLS=http://+:5044
 
-COPY . ./
+USER app
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG configuration=Release
+WORKDIR /src
+COPY ["financial-control/financial-control.csproj", "financial-control/"]
+RUN dotnet restore "financial-control/financial-control.csproj"
+COPY . .
+WORKDIR "/src/financial-control"
+RUN dotnet build "financial-control.csproj" -c $configuration -o /app/build
 
-RUN dotnet restore
+FROM build AS publish
+ARG configuration=Release
+RUN dotnet publish "financial-control.csproj" -c $configuration -o /app/publish /p:UseAppHost=false
 
-RUN dotnet publish -o out
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:6c4df091e4e531bb93bdbfe7e7f0998e7ced344f54426b7e874116a3dc3233ff
-WORKDIR /App
-COPY --from=build /App/out .
-
-ENTRYPOINT ["dotnet", "financial-control.dll"] 
-
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "financial-control.dll"]

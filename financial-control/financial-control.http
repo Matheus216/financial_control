@@ -1,6 +1,16 @@
-@financial_control_HostAddress = http://localhost:5044
+@financial_control_HostAddress = http://localhost:5044/api/
 
-GET {{financial_control_HostAddress}}/weatherforecast/
+GET {{financial_control_HostAddress}}Person
 Accept: application/json
+
+###
+
+POST {{financial_control_HostAddress}}Person
+Content-Type: application/json
+
+{
+    "id": 0,
+    "name": "string"
+}
 
 ###
