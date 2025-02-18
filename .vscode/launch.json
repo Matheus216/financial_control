@@ -15,7 +15,15 @@
             "netCore": {
                 "debuggerPath": "/remote_debugger/vsdbg"
             }
+        },
+        {
+            "name": "Docker .NET Launch",
+            "type": "docker",
+            "request": "launch",
+            "preLaunchTask": "docker-run: debug",
+            "netCore": {
+                "appProject": "${workspaceFolder}/financial-control/financial-control.csproj"
+            }
         }
-
     ]
 }
