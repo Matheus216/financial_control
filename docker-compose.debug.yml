@@ -3,7 +3,22 @@
 version: '3.4'
 
 services:
-  financialcontrol:
+  postgrees:
+    image: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: DbFinancial
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - FinancialNet
+  app:
     image: financialcontrol
     build:
       context: .
@@ -16,3 +31,11 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
+    networks:
+      - FinancialNet
+    depends_on:
+      postgrees:
+        condition: service_healthy
+networks:
+  FinancialNet:
+    driver: bridge

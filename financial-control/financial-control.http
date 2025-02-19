@@ -1,4 +1,5 @@
 @financial_control_HostAddress = http://localhost:5044/api/
+@devsFour = "https://www.4devs.com.br/ferramentas_online.php"
 
 GET {{financial_control_HostAddress}}Person
 Accept: application/json
@@ -14,3 +15,7 @@ Content-Type: application/json
 }
 
 ###
+POST {{devsFour}} 
+Content-Type: application/x-www-form-urlencoded
+
+acao=gerar_cpf&pontuacao=trueacao=gerar_cpf&pontuacao=true

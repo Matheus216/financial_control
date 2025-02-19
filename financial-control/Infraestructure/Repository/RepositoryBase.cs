@@ -5,38 +5,41 @@ namespace financial_control.Infraestructure.Repository;
 
 public class RepositoryBase<T> where T : class
 {
+    private readonly DbSet<T> _dbSet;
     private readonly DbFinancialContext _context;
 
     public RepositoryBase(DbFinancialContext context)
     {
+        _dbSet = context.Set<T>();
         _context = context;
     }
 
     public async Task<IEnumerable<T>> GetAll()
     {
-        return await _context.Set<T>().ToListAsync();
+        return await _dbSet.ToListAsync();
     }
 
-    public async Task<T> GetById(long id)
+    public async Task<T?> GetById(long id)
     {
-        return await _context.Set<T>().FindAsync(id);
+        var response = await _dbSet.FindAsync(id);
+        return response;
     }
 
-    public async Task Insert(T entity)
+    public async Task<int> Insert(T entity)
     {
-        await _context.Set<T>().AddAsync(entity);
-        await _context.SaveChangesAsync();
+        await _dbSet.AddAsync(entity);
+        return await _context.SaveChangesAsync();
     }
 
-    public async Task Update(T entity)
+    public async Task<int> Update(T entity)
     {
-        _context.Set<T>().Update(entity);
-        await _context.SaveChangesAsync();
+        _dbSet.Update(entity);
+        return await _context.SaveChangesAsync();
     }
 
-    public async Task Delete(T entity)
+    public async Task<int> Delete(T entity)
     {
-        _context.Set<T>().Remove(entity);
-        await _context.SaveChangesAsync();
+        _dbSet.Remove(entity);
+        return await _context.SaveChangesAsync();
     }   
 }

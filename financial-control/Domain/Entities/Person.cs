@@ -1,17 +1,13 @@
 namespace financial_control.Domain.Entities;
 
-public class Person
+public class Person(long id, string name)
 {
-    public Person(long Id, string Name)
-    {
-        this.Id = Id;
-        this.Name = Name;
-    }
-    public Person(string name) 
+    public Person(string name)
+        : this(0, name)
     {
         Name = name;   
     }
 
-    public long Id { get; private set; }
-    public string Name { get; private set; }
+    public long Id { get; private set; } = id;
+    public string Name { get; private set; } = name;
 }
