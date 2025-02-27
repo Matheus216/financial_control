@@ -50,7 +50,6 @@ public class PublisherService
             body
         );
         
-
         _logger.LogInformation("Message published to RabbitMQ");
     }
 }

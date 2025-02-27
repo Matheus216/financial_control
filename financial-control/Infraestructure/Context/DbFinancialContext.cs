@@ -15,7 +15,7 @@ public class DbFinancialContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        options.UseNpgsql("Host=postgres;Port=5432;Database=DbFinancial;Username=admin;Password=admin");
+        options.UseNpgsql(_configuration.GetConnectionString("DbFinancial") );
     }
 
     public DbSet<FinancialModel> Financial { get; set; }

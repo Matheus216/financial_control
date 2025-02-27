@@ -1,9 +1,7 @@
 # Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
 
-version: '3.4'
-
 services:
-  postgrees:
+  postgres:
     image: postgres
     environment:
       POSTGRES_USER: admin
@@ -19,7 +17,7 @@ services:
     networks:
       - FinancialNet
   app:
-    image: financialcontrol
+    image: letodev/financial-image
     build:
       context: .
       dockerfile: financial-control/Dockerfile
@@ -28,13 +26,17 @@ services:
     ports:
       - 5044:5044
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      ConnectionStrings:DbFinancial: "Host=postgres;Port=5432;Database=DbFinancial;Username=admin;Password=admin"
+      RABBITMQ:HOSTNAME: "rabbitmq"
+      RABBITMQ:USERNAME: "admin"
+      RABBITMQ:PASSWORD: "admin"
+      ASPNETCORE_ENVIRONMENT: Development
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
     networks:
       - FinancialNet
     depends_on:
-      postgrees:
+      postgres:
         condition: service_healthy
 networks:
   FinancialNet:
