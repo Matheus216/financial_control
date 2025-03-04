@@ -1,8 +1,8 @@
-using financial_control.Infraestructure.Models;
+using financial_control.Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace financial_control.Infraestructure.Context;
+namespace financial_control.Infrastructure.Context;
 
 public class DbFinancialContext : DbContext
 {

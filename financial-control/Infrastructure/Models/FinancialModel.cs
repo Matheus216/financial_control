@@ -1,4 +1,4 @@
-namespace financial_control.Infraestructure.Models;
+namespace financial_control.Infrastructure.Models;
 
 public class FinancialModel
 {

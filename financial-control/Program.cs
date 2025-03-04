@@ -1,7 +1,9 @@
-using financial_control.Infraestructure.Context;
-using financial_control.Infraestructure.Repository;
-using financial_control.Services;
+using financial_control.Infrastructure.Repository;
+using financial_control_infrastructure.Connections;
+using financial_control.Infrastructure.Context;
+using financial_control_infrastructure.Message;
 using Microsoft.AspNetCore.Diagnostics;
+using financial_control.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +17,11 @@ builder.Services.AddDbContext<DbFinancialContext>();
 builder.Services.AddScoped<PersonRepository>();
 builder.Services.AddScoped<PersonService>();
 
+builder.Services.AddSingleton<RabbitMQConnection>();
+builder.Services.AddSingleton<IPublisherService, PublisherService>();
+
 var app = builder.Build();
 
-// apply automaticlly logger information in case of exception
 app.UseExceptionHandler(appBuilder => {
     appBuilder.Run(async context => {
         var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();

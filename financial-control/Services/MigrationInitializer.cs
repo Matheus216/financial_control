@@ -1,4 +1,4 @@
-using financial_control.Infraestructure.Context;
+using financial_control.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 

@@ -1,4 +1,4 @@
-using financial_control.Infraestructure.Models;
+using financial_control.Infrastructure.Models;
 using financial_control.Services;
 using Microsoft.AspNetCore.Mvc;
 

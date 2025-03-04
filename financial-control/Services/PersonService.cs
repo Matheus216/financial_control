@@ -1,5 +1,5 @@
-using financial_control.Infraestructure.Repository;
-using financial_control.Infraestructure.Models;
+using financial_control.Infrastructure.Repository;
+using financial_control.Infrastructure.Models;
 
 namespace financial_control.Services;
 

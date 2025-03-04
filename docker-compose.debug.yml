@@ -30,6 +30,9 @@ services:
       RABBITMQ:HOSTNAME: "rabbitmq"
       RABBITMQ:USERNAME: "admin"
       RABBITMQ:PASSWORD: "admin"
+      RABBITMQ:PORT: "5672"
+      RABBITMQ:EXCHANGE: "financial-exchange"
+      RABBITMQ:QUEUE: "financial-queue"
       ASPNETCORE_ENVIRONMENT: Development
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
@@ -38,6 +41,15 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+  rabbitmq:
+    image: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    ports:
+      - 5672:5672
+    networks:
+      - FinancialNet
 networks:
   FinancialNet:
     driver: bridge
