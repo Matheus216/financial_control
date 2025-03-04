@@ -1,9 +1,10 @@
-using financial_control.Infrastructure.Repository;
 using financial_control_infrastructure.Connections;
 using financial_control.Infrastructure.Context;
 using financial_control_infrastructure.Message;
 using Microsoft.AspNetCore.Diagnostics;
 using financial_control.Services;
+using financial_control_Infrastructure.Repositories;
+using financial_control_domain.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +16,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<DbFinancialContext>();
 
 builder.Services.AddScoped<PersonRepository>();
-builder.Services.AddScoped<PersonService>();
+builder.Services.AddScoped<IPersonService, PersonService>();
 
 builder.Services.AddSingleton<RabbitMQConnection>();
 builder.Services.AddSingleton<IPublisherService, PublisherService>();

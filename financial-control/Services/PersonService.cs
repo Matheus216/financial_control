@@ -1,9 +1,10 @@
-using financial_control.Infrastructure.Repository;
-using financial_control.Infrastructure.Models;
+using financial_control_Infrastructure.Repositories;
+using financial_control_domain.Interfaces.Services;
+using financial_control_domain.Models;
 
 namespace financial_control.Services;
 
-public class PersonService
+public class PersonService : IPersonService
 {
     private readonly PersonRepository _personRepository;
 

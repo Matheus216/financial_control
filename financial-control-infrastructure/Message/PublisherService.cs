@@ -1,5 +1,7 @@
+using financial_control_domain.Interfaces.Services;
 using financial_control_infrastructure.Connections;
 using Microsoft.Extensions.Configuration;
+using financial_control_domain.Models;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client.Events;
 using System.Text.Json;
@@ -12,15 +14,18 @@ public class PublisherService : IPublisherService
     private readonly IConfiguration _configuration;
     private readonly ILogger<PublisherService> _logger;
     private readonly RabbitMQConnection _connection;
+    private readonly IPersonService _personService;
 
     public PublisherService(IConfiguration configuration, 
         ILogger<PublisherService> logger,
-        RabbitMQConnection connection 
+        RabbitMQConnection connection,
+        IPersonService personService
     )
     {
         _configuration = configuration;
         _logger = logger;
         _connection = connection;
+        _personService = personService;
     }
 
     public async Task PublishMessage(object request)
@@ -87,8 +92,7 @@ public class PublisherService : IPublisherService
             var message = Encoding.UTF8.GetString(body);
 
             _logger.LogInformation($"Message received: {message}");
-
-            return Task.CompletedTask;
+            return _personService.Create(JsonSerializer.Deserialize<PersonModel>(message) ?? throw new ArgumentException());
         };   
 
         await channel.BasicConsumeAsync
@@ -98,9 +102,4 @@ public class PublisherService : IPublisherService
             consumer: consumer
         );
     }
-}
-
-public interface IPublisherService
-{
-    Task PublishMessage(object request);
 }

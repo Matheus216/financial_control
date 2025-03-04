@@ -1,4 +1,4 @@
-namespace financial_control.Domain.Entities;
+namespace financial_control_Domain.Entities;
 
 public class Person(long id, string name)
 {

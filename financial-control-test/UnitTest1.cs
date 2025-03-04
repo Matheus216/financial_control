@@ -1,4 +1,4 @@
-using financial_control.Domain.Entities;
+using financial_control_Domain.Entities;
 
 namespace financial_control_test;
 

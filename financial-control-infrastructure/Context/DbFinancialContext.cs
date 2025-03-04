@@ -1,6 +1,6 @@
-using financial_control.Infrastructure.Models;
-using Microsoft.AspNetCore.Mvc;
+using financial_control_domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace financial_control.Infrastructure.Context;
 

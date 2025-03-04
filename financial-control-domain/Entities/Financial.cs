@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace financial_control.Domain.Entities; 
+namespace financial_control_Domain.Entities; 
 public class Financial(long id, decimal value, DateTime date, short type, long personId, Person person)
 {
     public Financial(decimal value, DateTime date, short type, long personId, Person person) 

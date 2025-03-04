@@ -1,7 +1,7 @@
 using financial_control.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace financial_control.Infrastructure.Repository;
+namespace financial_control_Infrastructure.Repositories;
 
 public class RepositoryBase<T> where T : class
 {
