@@ -68,12 +68,7 @@ public class ConsumerService : BackgroundService
     public async Task Consumer()
     {
         _logger.LogInformation("Start consumer message");
-        await _channel.ExchangeDeclareAsync
-        (
-            exchange: _configuration["RABBITMQ:EXCHANGE"] ?? throw new ArgumentException("invalid"),
-            type: ExchangeType.Fanout
-        );
-
+       
         await _channel.QueueDeclareAsync
         (
             queue: _configuration["RABBITMQ:QUEUE"] ?? throw new ArgumentException("invalid"),
@@ -99,7 +94,7 @@ public class ConsumerService : BackgroundService
 
         await _channel.BasicConsumeAsync
         (
-            queue: _configuration["RABBITMQ:QUEUE"] ?? throw new ArgumentException(),
+            _configuration["RABBITMQ:QUEUE"] ?? throw new ArgumentException(),
             autoAck: true,
             consumer: consumer
         );

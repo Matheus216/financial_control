@@ -32,15 +32,9 @@ public class PublisherService : IPublisherService
 
             using var channel = await connection.CreateChannelAsync();
 
-            await channel.ExchangeDeclareAsync
-            (
-                exchange: _configuration["RABBITMQ:EXCHANGE"] ?? throw new ArgumentException("Invalid"),
-                type: ExchangeType.Fanout
-            );
-
             await channel.QueueDeclareAsync
             (
-                queue: _configuration["RABBITMQ:QUEUE"] ?? throw new ArgumentException("Invalid"),
+                queue: _configuration["RABBITMQ:QUEUE"] ?? throw new ArgumentException("invalid"),
                 durable: false,
                 exclusive: false,
                 autoDelete: false,
@@ -51,8 +45,8 @@ public class PublisherService : IPublisherService
 
             await channel.BasicPublishAsync
             (
-                exchange: _configuration["RABBITMQ:EXCHANGE"] ?? throw new ArgumentException("Invalid"),
-                routingKey: string.Empty,
+                exchange: string.Empty,
+                routingKey: _configuration["RABBITMQ:QUEUE"],
                 body: body
             );
 
