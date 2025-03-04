@@ -6,7 +6,12 @@ namespace financial_control.Infrastructure.Context;
 
 public class DbFinancialContext : DbContext
 {
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration? _configuration;
+
+    public DbFinancialContext()
+    {
+        
+    }
 
     public DbFinancialContext(IConfiguration configuration)
     {
@@ -15,7 +20,9 @@ public class DbFinancialContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        options.UseNpgsql(_configuration.GetConnectionString("DbFinancial") );
+        options.UseNpgsql(_configuration is null 
+            ?   "Host=localhost;Port=5432;Database=DbFinancial;Username=admin;Password=admin"
+            :  _configuration.GetConnectionString("DbFinancial") );
     }
 
     public DbSet<FinancialModel> Financial { get; set; }

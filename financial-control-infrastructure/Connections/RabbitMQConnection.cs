@@ -2,32 +2,18 @@ using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
 
 namespace financial_control_infrastructure.Connections;
-public class RabbitMQConnection : IDisposable
+public static class RabbitMQConnection 
 {
-    private readonly IConnection _connection;
-    public IChannel? _channel { get; private set; }
-
-    public RabbitMQConnection(IConfiguration configuration)
+    public static IConnection GetConnection(IConfiguration _configuration)
     {
         var factory = new ConnectionFactory() 
         { 
-            HostName = configuration["RABBITMQ:HOSTNAME"] ?? throw new ArgumentException("Invalid"),
-            UserName = configuration["RABBITMQ:USERNAME"] ?? throw new ArgumentException("Invalid"),
-            Password = configuration["RABBITMQ:PASSWORD"] ?? throw new ArgumentException("Invalid"),
-            Port = int.Parse(configuration["RABBITMQ:PORT"] ?? throw new ArgumentException("Invalid"))
+            HostName = _configuration["RABBITMQ:HOSTNAME"] ?? throw new ArgumentException("Invalid"),
+            UserName = _configuration["RABBITMQ:USERNAME"] ?? throw new ArgumentException("Invalid"),
+            Password = _configuration["RABBITMQ:PASSWORD"] ?? throw new ArgumentException("Invalid"),
+            Port = int.Parse(_configuration["RABBITMQ:PORT"] ?? throw new ArgumentException("Invalid"))
         };
 
-        _connection = factory.CreateConnectionAsync().Result;
-    }
-
-    public void Dispose()
-    {
-        _connection.Dispose();
-    }
-
-    public async Task<IChannel> GetChannelAsync()
-    {
-        _channel ??= await _connection.CreateChannelAsync();
-        return _channel;
+        return factory.CreateConnectionAsync().Result;
     }
 }

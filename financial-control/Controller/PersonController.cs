@@ -10,19 +10,17 @@ namespace financial_control.Controller;
 [Route("api/[controller]")]
 public class PersonController : ControllerBase
 {
-    private readonly PersonService _personService;
     private readonly IPublisherService _publisherService;
 
-    public PersonController(PersonService personService, IPublisherService publisherService)
+    public PersonController(IPublisherService publisherService)
     {
-        _personService = personService;
         _publisherService = publisherService;
     }
 
     [HttpGet]
     public async Task<IEnumerable<PersonModel>> GetAll()
     {
-        return await _personService.GetAll();
+        throw new NotImplementedException();
     }
 
     [HttpPost]

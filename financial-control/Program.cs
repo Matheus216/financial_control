@@ -18,8 +18,8 @@ builder.Services.AddDbContext<DbFinancialContext>();
 builder.Services.AddScoped<PersonRepository>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 
-builder.Services.AddSingleton<RabbitMQConnection>();
 builder.Services.AddSingleton<IPublisherService, PublisherService>();
+builder.Services.AddHostedService<ConsumerService>();
 
 var app = builder.Build();
 
