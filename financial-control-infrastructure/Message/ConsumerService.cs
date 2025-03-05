@@ -82,14 +82,25 @@ public class ConsumerService : BackgroundService
 
         consumer.ReceivedAsync += (model, ea) =>
         {
-            var body = ea.Body.ToArray();
-            var message = Encoding.UTF8.GetString(body);
+            try
+            {
+                var body = ea.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
 
-            using var scope = _serviceProvider.CreateAsyncScope();
-            var personService = scope.ServiceProvider.GetRequiredService<IPersonService>();
+                using var scope = _serviceProvider.CreateAsyncScope();
+                var personService = scope.ServiceProvider.GetRequiredService<IPersonService>();
 
-            _logger.LogInformation($"Message received: {message}");
-            return personService.Create(JsonSerializer.Deserialize<PersonModel>(message) ?? throw new ArgumentException());
+                _logger.LogInformation($"Message received: {message}");
+                return personService.Create(JsonSerializer.Deserialize<PersonModel>(message) ?? throw new ArgumentException());
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                 // TODO
+                return Task.CompletedTask;
+
+            }
         };
 
         await _channel.BasicConsumeAsync

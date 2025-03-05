@@ -8,11 +8,6 @@ public class DbFinancialContext : DbContext
 {
     private readonly IConfiguration? _configuration;
 
-    public DbFinancialContext()
-    {
-        
-    }
-
     public DbFinancialContext(IConfiguration configuration)
     {
         _configuration = configuration;
@@ -21,7 +16,7 @@ public class DbFinancialContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         options.UseNpgsql(_configuration is null 
-            ?   "Host=localhost;Port=5432;Database=DbFinancial;Username=admin;Password=admin"
+            ?   "Host=postgres;Port=5432;Database=DbFinancial;Username=admin;Password=admin"
             :  _configuration.GetConnectionString("DbFinancial") );
     }
 
