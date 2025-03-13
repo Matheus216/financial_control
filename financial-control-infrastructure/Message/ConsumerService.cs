@@ -18,11 +18,11 @@ public class ConsumerService : BackgroundService
     private IConnection _connection;
     private IChannel _channel;
     private readonly IConfiguration _configuration;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceScopeFactory _serviceProvider;
 
     public ConsumerService(ILogger<ConsumerService> logger,
         IConfiguration configuration,
-        IServiceProvider serviceProvider
+        IServiceScopeFactory serviceProvider
     )
     {
         _logger = logger;
