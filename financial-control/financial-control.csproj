@@ -17,4 +17,7 @@
     <ProjectReference Include="..\financial-control-domain\financial-control-domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="financial-control-integration-test" />
+  </ItemGroup>
 </Project>

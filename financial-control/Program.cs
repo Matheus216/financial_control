@@ -43,8 +43,10 @@ app.UseSwaggerUI();
 app.MapControllers();
 app.UseHttpsRedirection();
 
-app.InitializeMigration();
+if (!builder.Environment.IsEnvironment("Testing"))
+    app.InitializeMigration();
 
 app.Run();
 
+public partial class Program {} 
 
