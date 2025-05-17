@@ -32,6 +32,7 @@ services:
       RABBITMQ:EXCHANGE: "financial-exchange"
       RABBITMQ:QUEUE: "financial-queue"
       ASPNETCORE_ENVIRONMENT: Development
+      RABBITMQ:ConnectionString: "amqp://admin:admin@localhost:5672/"
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
     networks:

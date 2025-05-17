@@ -7,26 +7,21 @@ using RabbitMQ.Client;
 using System.Text;
 
 namespace financial_control_infrastructure.Message;
-public class PublisherService : IPublisherService 
+public class PublisherService(
+    ConfigurationConnection configuration, 
+    ILogger<PublisherService> logger
+) : IPublisherService 
 {
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<PublisherService> _logger;
-
-    public PublisherService(IConfiguration configuration, 
-        ILogger<PublisherService> logger
-    )
-    {
-        _configuration = configuration;
-        _logger = logger;
-    }
-
     public async Task PublishMessage(object request)
     {
         try
         {
-            _logger.LogInformation("Publishing message to RabbitMQ");
+            logger.LogInformation("Publishing message to RabbitMQ");
 
-            using var connection =  RabbitMQConnection.GetConnection(_configuration);
+            var connection = await new ConnectionFactory
+            {
+                Uri = new Uri(configuration.ConnectionString)
+            }.CreateConnectionAsync();
 
             ArgumentNullException.ThrowIfNull(request);
 
@@ -34,7 +29,7 @@ public class PublisherService : IPublisherService
 
             await channel.QueueDeclareAsync
             (
-                queue: _configuration["RABBITMQ:QUEUE"] ?? throw new ArgumentException("invalid"),
+                queue: configuration.QueueName,
                 durable: false,
                 exclusive: false,
                 autoDelete: false,
@@ -46,15 +41,15 @@ public class PublisherService : IPublisherService
             await channel.BasicPublishAsync
             (
                 exchange: string.Empty,
-                routingKey: _configuration["RABBITMQ:QUEUE"],
+                routingKey: configuration.QueueName!,
                 body: body
             );
 
-            _logger.LogInformation("Message published to RabbitMQ");
+            logger.LogInformation("Message published to RabbitMQ");
         }
         catch (System.Exception ex)
         {
-            _logger.LogError(ex, "Error publishing message to RabbitMQ");
+            logger.LogError(ex, "Error publishing message to RabbitMQ");
         }
     }
 }

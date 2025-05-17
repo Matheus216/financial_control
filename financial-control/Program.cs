@@ -19,6 +19,11 @@ builder.Services.AddScoped<PersonRepository>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 
 builder.Services.AddSingleton<IPublisherService, PublisherService>();
+builder.Services.AddSingleton<ConfigurationConnection>(new ConfigurationConnection(
+    builder.Configuration["RABBITMQ:ConnectionString"] ?? throw new ArgumentException("RABBITMQ:ConnectionString"),
+    builder.Configuration["RABBITMQ:QUEUE"] ?? throw new ArgumentException("RABBITMQ:QUEUE")
+    ));
+
 builder.Services.AddHostedService<ConsumerService>();
 
 var app = builder.Build();
@@ -47,6 +52,4 @@ if (!builder.Environment.IsEnvironment("Testing"))
     app.InitializeMigration();
 
 app.Run();
-
-public partial class Program {} 
 

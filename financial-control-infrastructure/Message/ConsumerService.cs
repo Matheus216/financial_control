@@ -1,84 +1,70 @@
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using RabbitMQ.Client.Events;
+using RabbitMQ.Client;
 using System.Text;
-using financial_control_infrastructure.Connections;
-using Microsoft.Extensions.Configuration;
-using financial_control_domain.Interfaces.Services;
-using System.Text.Json;
-using financial_control_domain.Models;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace financial_control_infrastructure.Message;
 
-public class ConsumerService : BackgroundService
+public class ConsumerService(
+    ILogger<ConsumerService> logger, 
+    ConfigurationConnection configurationConnection,
+    IConnectionFactory connectionFactory) : BackgroundService
 {
-    private ILogger<ConsumerService> _logger;
-    private IConnection _connection;
-    private IChannel _channel;
-    private readonly IConfiguration _configuration;
-    private readonly IServiceScopeFactory _serviceProvider;
-
-    public ConsumerService(ILogger<ConsumerService> logger,
-        IConfiguration configuration,
-        IServiceScopeFactory serviceProvider
-    )
-    {
-        _logger = logger;
-        _connection = RabbitMQConnection.GetConnection(configuration);   
-        _channel = _connection.CreateChannelAsync().Result;
-        _configuration = configuration;
-        _serviceProvider = serviceProvider;
-    }
-
+    
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-
-        _logger.LogInformation("Consuming message from RabbitMQ");
-
+        logger.LogInformation($"ConnectionString RabbitMQ: ");
+        var connection = await connectionFactory.CreateConnectionAsync(cancellationToken: stoppingToken);
+        ArgumentNullException.ThrowIfNull(connection);
+        var channel = await connection.CreateChannelAsync(cancellationToken: stoppingToken);
+        
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                if (_connection == null || !_connection.IsOpen || _channel == null || !_channel.IsOpen)
+                if (connection?.IsOpen == false || !channel.IsOpen)
                 {
-                    _connection = RabbitMQConnection.GetConnection(_configuration);
-                    _channel = await _connection.CreateChannelAsync();
-
-                    await Consumer();
+                    connection =  await connectionFactory.CreateConnectionAsync(cancellationToken: stoppingToken);
+                    channel = await connection?.CreateChannelAsync(cancellationToken: stoppingToken)!;
+            
+                    await Consumer(configurationConnection.QueueName);
                 }
 
-                var consumerCount = await _channel.ConsumerCountAsync(_configuration["RABBITMQ:QUEUE"] ?? throw new ArgumentException("invalid"));
+                var consumerCount = await channel.ConsumerCountAsync(
+                    configurationConnection.QueueName,
+                    stoppingToken
+                );
+                
                 if (consumerCount == 0)
                 {
                     await Consumer();
                 }
-
                 await Task.Delay(5000, stoppingToken);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while consuming message from RabbitMQ");
+                logger.LogError(ex, "An error occurred while consuming message from RabbitMQ");
                 await Task.Delay(5000, stoppingToken);
             }
         }
     }
-
-    public async Task Consumer()
+    private async Task Consumer()
     {
-        _logger.LogInformation("Start consumer message");
-       
-        await _channel.QueueDeclareAsync
+        logger.LogInformation("Start consumer message");
+        var connection = await connectionFactory.CreateConnectionAsync();
+        ArgumentNullException.ThrowIfNull(connection);
+        var channel = await connection.CreateChannelAsync();
+        await channel.QueueDeclareAsync
         (
-            queue: _configuration["RABBITMQ:QUEUE"] ?? throw new ArgumentException("invalid"),
+            queue: configurationConnection.QueueName,
             durable: false,
             exclusive: false,
             autoDelete: false,
             arguments: null
         );
 
-        var consumer = new AsyncEventingBasicConsumer(_channel);
+        var consumer = new AsyncEventingBasicConsumer(channel);
 
         consumer.ReceivedAsync += (model, ea) =>
         {
@@ -87,28 +73,25 @@ public class ConsumerService : BackgroundService
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
 
-                using var scope = _serviceProvider.CreateAsyncScope();
-                var personService = scope.ServiceProvider.GetRequiredService<IPersonService>();
-
-                _logger.LogInformation($"Message received: {message}");
-                return personService.Create(JsonSerializer.Deserialize<PersonModel>(message) ?? throw new ArgumentException());
-
+                // using var scope = serviceProvider.CreateAsyncScope();
+                // var personService = scope.ServiceProvider.GetRequiredService<IPersonService>();
+                logger.LogInformation($"Message received: {message}");
+                // return personService.Create(JsonSerializer.Deserialize<PersonModel>(message) ?? throw new ArgumentException());
+                return Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
-                 // TODO
+                logger.LogError(ex, ex.Message);
                 return Task.CompletedTask;
-
             }
         };
 
-        await _channel.BasicConsumeAsync
+        await channel.BasicConsumeAsync
         (
-            _configuration["RABBITMQ:QUEUE"] ?? throw new ArgumentException(),
+            configurationConnection.QueueName,
             autoAck: true,
             consumer: consumer
         );
-        _logger.LogInformation("Created basic consumer");
+        logger.LogInformation("Created basic consumer");
     }
 }
