@@ -7,47 +7,40 @@ using System.Text;
 namespace financial_control_infrastructure.Message;
 public class PublisherService(
     ConfigurationConnection configuration, 
-    ILogger<PublisherService> logger
+    ILogger<PublisherService> logger,
+    IConnectionFactory connection
 ) : IPublisherService 
 {
+    private readonly ILogger<PublisherService> _logger = logger;
+    private readonly ConfigurationConnection _configurationConnection = configuration;
+    private readonly IConnectionFactory _connectionFactory = connection; 
+
     public async Task PublishMessage(object request)
     {
         try
         {
-            logger.LogInformation("Publishing message to RabbitMQ");
+            _logger.LogInformation("Publishing message to RabbitMQ");
 
-            var connection = await new ConnectionFactory
-            {
-                Uri = new Uri(configuration.ConnectionString)
-            }.CreateConnectionAsync();
+            var connection = await _connectionFactory.CreateConnectionAsync();
 
             ArgumentNullException.ThrowIfNull(request);
 
             using var channel = await connection.CreateChannelAsync();
 
-            await channel.QueueDeclareAsync
-            (
-                queue: configuration.QueueName,
-                durable: false,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null
-            );
-
             var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(request));
 
             await channel.BasicPublishAsync
             (
-                exchange: string.Empty,
-                routingKey: configuration.QueueName!,
+                exchange: _configurationConnection.exchangeName,
+                routingKey: string.Empty,
                 body: body
             );
 
-            logger.LogInformation("Message published to RabbitMQ");
+            _logger.LogInformation("Message published to RabbitMQ");
         }
         catch (System.Exception ex)
         {
-            logger.LogError(ex, "Error publishing message to RabbitMQ");
+            _logger.LogError(ex, "Error publishing message to RabbitMQ");
         }
     }
 }

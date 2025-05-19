@@ -18,26 +18,39 @@ builder.Services.AddDbContext<DbFinancialContext>();
 builder.Services.AddScoped<PersonRepository>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 
-string connectionStringRabbit = string.Empty, queue = string.Empty;
+string connectionStringRabbit = string.Empty,
+    queue = string.Empty,
+    exchange = string.Empty;
 
 if (!builder.Environment.IsEnvironment("Testing"))
 {
     connectionStringRabbit = builder.Configuration["RABBITMQ:ConnectionString"] ?? throw new ArgumentException("RABBITMQ:ConnectionString");
     queue = builder.Configuration["RABBITMQ:QUEUE"] ?? throw new ArgumentException("RABBITMQ:QUEUE");
+    exchange = builder.Configuration["RABBITMQ:EXCHANGE"] ?? throw new ArgumentException("RABBITMQ:EXCHANGE");
+
+}
+else
+{
+    connectionStringRabbit = "amqp://admin:admin@localhost:5672/";
+    queue = "test";
+    exchange = "exchange"; 
 }
 
 builder.Services.AddSingleton<IPublisherService, PublisherService>();
-builder.Services.AddSingleton<ConfigurationConnection>(new ConfigurationConnection(
+builder.Services.AddSingleton(new ConfigurationConnection(
     connectionStringRabbit,
-    queue
+    queue, 
+    exchange
     ));
 
-builder.Services.AddSingleton<IConnectionFactory>(new ConnectionFactory
+var connectionFactory = new ConnectionFactory
 {
     Uri = new Uri(connectionStringRabbit)
-});
+};
 
-builder.Services.AddHostedService<ConsumerService>();
+builder.Services.AddSingleton<IConnectionFactory>(connectionFactory);
+if (!builder.Environment.IsEnvironment("Testing"))
+    builder.Services.AddHostedService<ConsumerService>();
 
 var app = builder.Build();
 

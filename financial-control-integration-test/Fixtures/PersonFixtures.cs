@@ -9,7 +9,7 @@ namespace financial_control_integration_test.Fixtures;
 
 public class PersonFixtures
 {
-    public static async Task CreatePerson(ApiFactory<IInitialProject> configuration, bool create) {
+    public static async Task CreatePerson(ApiFactory configuration, bool create) {
         using var scope = configuration.Services.CreateScope();
 
         var provider = scope.ServiceProvider;

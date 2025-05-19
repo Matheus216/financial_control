@@ -12,10 +12,11 @@ using Microsoft.Extensions.Logging;
 using Testcontainers.RabbitMq;
 using RabbitMQ.Client;
 using Moq;
+using Microsoft.AspNetCore.TestHost;
 
 namespace financial_control_integration_test.Configuration;
 
-public class ApiFactory<TProgram> : WebApplicationFactory<IInitialProject>, IAsyncLifetime
+public class ApiFactory : WebApplicationFactory<IInitialProject>, IAsyncLifetime
 {
     private readonly RabbitMqContainer _rabbitMqContainer =
         new RabbitMqBuilder()
@@ -25,17 +26,19 @@ public class ApiFactory<TProgram> : WebApplicationFactory<IInitialProject>, IAsy
     public readonly string Queue = "queue-test";
     public readonly string Exchange = "exchange-test";
     public required ConsumerService ConsumerService { get; set; }
-    private Mock<ILogger<ConsumerService>> loggerConsumer { get; set; } = new Mock<ILogger<ConsumerService>>();
+    public required ConnectionFactory connectionFactory { get; set; }
+    private Mock<ILogger<ConsumerService>> LoggerConsumer { get; set; } = new Mock<ILogger<ConsumerService>>();
     public async Task InitializeAsync()
     {
+        
         await _rabbitMqContainer.StartAsync();
         ConsumerService = new ConsumerService(
-            loggerConsumer.Object,
+            LoggerConsumer.Object,
             new ConfigurationConnection(
                 _rabbitMqContainer.GetConnectionString(),
-                Queue
-            ),
-            new ConnectionFactory { Uri = new Uri(_rabbitMqContainer.GetConnectionString())}
+                Queue,
+                Exchange
+            )
         );
     }
 
@@ -43,29 +46,40 @@ public class ApiFactory<TProgram> : WebApplicationFactory<IInitialProject>, IAsy
     {
         var root = new InMemoryDatabaseRoot();
 
-        builder.ConfigureServices(services =>
+        builder.ConfigureTestServices(services =>
         {
-            services.RemoveAll(typeof(DbContextOptions<DbFinancialContext>));
+            var connectionFactory = new ConnectionFactory
+            {
+                Uri = new Uri(_rabbitMqContainer.GetConnectionString())
+            };
+            var configurationConnection = new ConfigurationConnection
+            (
+                _rabbitMqContainer.GetConnectionString(),
+                Queue,
+                Exchange
+            );
 
+            services.Remove<DbContextOptions<DbFinancialContext>>();
             services.AddDbContext<DbFinancialContext>(options =>
             {
                 options.UseInMemoryDatabase("FinancialDb", root);
             });
 
-            services.RemoveAll(typeof(ConfigurationConnection));
-            services.AddSingleton<ConfigurationConnection>(new ConfigurationConnection(
-                _rabbitMqContainer.GetConnectionString(),
-                "queue-test"
-                ));
+            services.Remove<ConfigurationConnection>();
+            services.AddSingleton(configurationConnection);
 
-            services.RemoveAll(typeof(PublisherService));
-            services.AddSingleton(
+            services.Remove<PublisherService>();
+            services.AddSingleton(x =>
                 new PublisherService(
-                    new ConfigurationConnection(_rabbitMqContainer.GetConnectionString(), "queue-test"),
-                    new Mock<ILogger<PublisherService>>().Object)
+                    new ConfigurationConnection(_rabbitMqContainer.GetConnectionString(), Queue, Exchange),
+                    new Mock<ILogger<PublisherService>>().Object,
+                    connectionFactory
+                    )
                 );
-        });
 
+            services.Remove<IConnectionFactory>();
+            services.AddSingleton<IConnectionFactory>(connectionFactory);
+        });
         builder.UseEnvironment("Testing");
         base.ConfigureWebHost(builder);
     }

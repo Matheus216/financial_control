@@ -8,19 +8,25 @@ namespace financial_control_infrastructure.Message;
 
 public class ConsumerService(
     ILogger<ConsumerService> logger, 
-    ConfigurationConnection configurationConnection,
-    IConnectionFactory connectionFactory) : BackgroundService
+    ConfigurationConnection configurationConnection) : BackgroundService
 {
+
+    private readonly IConnectionFactory _connectionFactory =
+        new ConnectionFactory { Uri = new Uri(configurationConnection.ConnectionString) };
+    private readonly ConfigurationConnection _configurationConnection = configurationConnection;
+    private readonly ILogger<ConsumerService> _logger = logger;
+
     public async Task QueueBind(string exchange, string queueName, string routingKey = "")
     {
-        using var connection = await connectionFactory.CreateConnectionAsync();
+        using var connection = await _connectionFactory.CreateConnectionAsync();
         using var channel = await connection.CreateChannelAsync();
 
         await channel.ExchangeDeclareAsync(exchange: exchange, type: ExchangeType.Fanout, durable: true);
         var queueResult = await channel.QueueDeclareAsync(
             queue: queueName,
             durable: true,
-            exclusive: true
+            exclusive: false,
+            autoDelete: false
         );
         await channel.QueueBindAsync(
             queue: queueName,
@@ -28,61 +34,61 @@ public class ConsumerService(
             routingKey: routingKey
         );
     }
-
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation($"ConnectionString RabbitMQ: ");
-        var connection = await connectionFactory.CreateConnectionAsync(cancellationToken: stoppingToken);
-        ArgumentNullException.ThrowIfNull(connection);
-        var channel = await connection.CreateChannelAsync(cancellationToken: stoppingToken);
-
-        while (!stoppingToken.IsCancellationRequested)
+        _logger.LogInformation($"ConnectionString RabbitMQ: ");
+        try
         {
-            try
+            var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken: stoppingToken);
+
+            ArgumentNullException.ThrowIfNull(connection);
+            var channel = await connection.CreateChannelAsync(cancellationToken: stoppingToken);
+
+            while (!stoppingToken.IsCancellationRequested)
             {
-                if (connection?.IsOpen == false || !channel.IsOpen)
+                try
                 {
-                    connection = await connectionFactory.CreateConnectionAsync(cancellationToken: stoppingToken);
-                    channel = await connection?.CreateChannelAsync(cancellationToken: stoppingToken)!;
+                    if (connection?.IsOpen == false || !channel.IsOpen)
+                    {
+                        connection = await _connectionFactory.CreateConnectionAsync(cancellationToken: stoppingToken);
+                        channel = await connection?.CreateChannelAsync(cancellationToken: stoppingToken)!;
 
-                    await Consumer();
+                        await Consumer(TimeSpan.FromSeconds(5));
+                    }
+
+                    var consumerCount = await channel.ConsumerCountAsync(
+                        _configurationConnection.QueueName,
+                        stoppingToken
+                    );
+
+                    if (consumerCount == 0)
+                    {
+                        await Consumer(TimeSpan.FromSeconds(5));
+                    }
+                    await Task.Delay(5000, stoppingToken);
                 }
-
-                var consumerCount = await channel.ConsumerCountAsync(
-                    configurationConnection.QueueName,
-                    stoppingToken
-                );
-
-                if (consumerCount == 0)
+                catch (Exception ex)
                 {
-                    await Consumer();
+                    _logger.LogError(ex, "An error occurred while consuming message from RabbitMQ");
+                    await Task.Delay(5000, stoppingToken);
                 }
-                await Task.Delay(5000, stoppingToken);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "An error occurred while consuming message from RabbitMQ");
-                await Task.Delay(5000, stoppingToken);
             }
         }
+        catch (System.Exception e)
+        {
+            _logger.LogError(e, "Error: {E}", e.Message);
+        }
     }
-    public async Task<bool> Consumer()
+    
+    public async Task<bool> Consumer(TimeSpan timeout)
     {
         var messageReceived = new TaskCompletionSource<bool>();
 
-        logger.LogInformation("Start consumer message");
-        var connection = await connectionFactory.CreateConnectionAsync();
+        _logger.LogInformation("Start consumer message");
+        var connection = await _connectionFactory.CreateConnectionAsync();
         ArgumentNullException.ThrowIfNull(connection);
         var channel = await connection.CreateChannelAsync();
-        await channel.QueueDeclareAsync
-        (
-            queue: configurationConnection.QueueName,
-            durable: false,
-            exclusive: false,
-            autoDelete: false,
-            arguments: null
-        );
 
         var consumer = new AsyncEventingBasicConsumer(channel);
 
@@ -96,25 +102,25 @@ public class ConsumerService(
 
                 // using var scope = serviceProvider.CreateAsyncScope();
                 // var personService = scope.ServiceProvider.GetRequiredService<IPersonService>();
-                logger.LogInformation($"Message received: {message}");
+                _logger.LogInformation($"Message received: {message}");
                 // return personService.Create(JsonSerializer.Deserialize<PersonModel>(message) ?? throw new ArgumentException());
-                return Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, ex.Message);
-                return Task.CompletedTask;
+                _logger.LogError(ex, ex.Message);
             }
+            return Task.CompletedTask;
         };
 
-        await channel.BasicConsumeAsync
+        var response = await channel.BasicConsumeAsync
         (
-            configurationConnection.QueueName,
+            _configurationConnection.QueueName,
             autoAck: true,
             consumer: consumer
         );
-        logger.LogInformation("Created basic consumer");
+        _logger.LogInformation("Created basic consumer");
 
-        return Task.CompletedTask == messageReceived.Task;
+
+        return await messageReceived.Task;
     }
 }

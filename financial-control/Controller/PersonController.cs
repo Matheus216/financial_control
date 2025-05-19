@@ -8,20 +8,9 @@ namespace financial_control.Controller;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PersonController : ControllerBase
+public class PersonController(IPublisherService publisherService) : ControllerBase
 {
-    private readonly IPublisherService _publisherService;
-
-    public PersonController(IPublisherService publisherService)
-    {
-        _publisherService = publisherService;
-    }
-
-    [HttpGet]
-    public async Task<IEnumerable<PersonModel>> GetAll()
-    {
-        throw new NotImplementedException();
-    }
+    private readonly IPublisherService _publisherService = publisherService;
 
     [HttpPost]
     public async Task<ActionResult<PersonModel>> Create([FromBody] PersonModel person)
