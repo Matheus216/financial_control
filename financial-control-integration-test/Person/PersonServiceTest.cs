@@ -6,21 +6,23 @@ using financial_control.Configuration;
 
 namespace financial_control_integration_test.Person;
 
-public class PersonServiceTest(ApiFactory<IInitialProject> webConfiguration)
+public class PersonServiceTest(ApiFactory<IInitialProject> factory)
     : IClassFixture<ApiFactory<IInitialProject>>
 {
-    private readonly HttpClient _client = webConfiguration.CreateClient();
-    private readonly ConsumerService _consumerService = webConfiguration.ConsumerService;
+    private readonly HttpClient _client = factory.CreateClient();
+    private readonly ConsumerService _consumerService = factory.ConsumerService;
 
     [Fact]
     public async Task ShouldBeSuccessWhenPassCorrectlyData() {
         //Arrange
         var person = new { Name = "francisco" };
-        
+
+        await _consumerService.QueueBind(factory.Exchange, factory.Queue);
+
         //Act
-        var response = await _client.PostAsJsonAsync("/api/person", person);
+        var response = await _consumerService.Consumer();
 
         //Arrange
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.True(response);
     }
 }

@@ -1,10 +1,10 @@
-using financial_control_infrastructure.Connections;
 using financial_control.Infrastructure.Context;
 using financial_control_infrastructure.Message;
 using Microsoft.AspNetCore.Diagnostics;
 using financial_control.Services;
 using financial_control_Infrastructure.Repositories;
 using financial_control_domain.Interfaces.Services;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,11 +18,24 @@ builder.Services.AddDbContext<DbFinancialContext>();
 builder.Services.AddScoped<PersonRepository>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 
+string connectionStringRabbit = string.Empty, queue = string.Empty;
+
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    connectionStringRabbit = builder.Configuration["RABBITMQ:ConnectionString"] ?? throw new ArgumentException("RABBITMQ:ConnectionString");
+    queue = builder.Configuration["RABBITMQ:QUEUE"] ?? throw new ArgumentException("RABBITMQ:QUEUE");
+}
+
 builder.Services.AddSingleton<IPublisherService, PublisherService>();
 builder.Services.AddSingleton<ConfigurationConnection>(new ConfigurationConnection(
-    builder.Configuration["RABBITMQ:ConnectionString"] ?? throw new ArgumentException("RABBITMQ:ConnectionString"),
-    builder.Configuration["RABBITMQ:QUEUE"] ?? throw new ArgumentException("RABBITMQ:QUEUE")
+    connectionStringRabbit,
+    queue
     ));
+
+builder.Services.AddSingleton<IConnectionFactory>(new ConnectionFactory
+{
+    Uri = new Uri(connectionStringRabbit)
+});
 
 builder.Services.AddHostedService<ConsumerService>();
 

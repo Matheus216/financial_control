@@ -1,6 +1,4 @@
 using financial_control_domain.Interfaces.Services;
-using financial_control_infrastructure.Connections;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using RabbitMQ.Client;

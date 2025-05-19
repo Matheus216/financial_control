@@ -11,6 +11,24 @@ public class ConsumerService(
     ConfigurationConnection configurationConnection,
     IConnectionFactory connectionFactory) : BackgroundService
 {
+    public async Task QueueBind(string exchange, string queueName, string routingKey = "")
+    {
+        using var connection = await connectionFactory.CreateConnectionAsync();
+        using var channel = await connection.CreateChannelAsync();
+
+        await channel.ExchangeDeclareAsync(exchange: exchange, type: ExchangeType.Fanout, durable: true);
+        var queueResult = await channel.QueueDeclareAsync(
+            queue: queueName,
+            durable: true,
+            exclusive: true
+        );
+        await channel.QueueBindAsync(
+            queue: queueName,
+            exchange: exchange,
+            routingKey: routingKey
+        );
+    }
+
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -18,24 +36,24 @@ public class ConsumerService(
         var connection = await connectionFactory.CreateConnectionAsync(cancellationToken: stoppingToken);
         ArgumentNullException.ThrowIfNull(connection);
         var channel = await connection.CreateChannelAsync(cancellationToken: stoppingToken);
-        
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
                 if (connection?.IsOpen == false || !channel.IsOpen)
                 {
-                    connection =  await connectionFactory.CreateConnectionAsync(cancellationToken: stoppingToken);
+                    connection = await connectionFactory.CreateConnectionAsync(cancellationToken: stoppingToken);
                     channel = await connection?.CreateChannelAsync(cancellationToken: stoppingToken)!;
-            
-                    await Consumer(configurationConnection.QueueName);
+
+                    await Consumer();
                 }
 
                 var consumerCount = await channel.ConsumerCountAsync(
                     configurationConnection.QueueName,
                     stoppingToken
                 );
-                
+
                 if (consumerCount == 0)
                 {
                     await Consumer();
@@ -49,8 +67,10 @@ public class ConsumerService(
             }
         }
     }
-    private async Task Consumer()
+    public async Task<bool> Consumer()
     {
+        var messageReceived = new TaskCompletionSource<bool>();
+
         logger.LogInformation("Start consumer message");
         var connection = await connectionFactory.CreateConnectionAsync();
         ArgumentNullException.ThrowIfNull(connection);
@@ -68,6 +88,7 @@ public class ConsumerService(
 
         consumer.ReceivedAsync += (model, ea) =>
         {
+            messageReceived.SetResult(true);
             try
             {
                 var body = ea.Body.ToArray();
@@ -93,5 +114,7 @@ public class ConsumerService(
             consumer: consumer
         );
         logger.LogInformation("Created basic consumer");
+
+        return Task.CompletedTask == messageReceived.Task;
     }
 }
