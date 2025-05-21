@@ -8,11 +8,12 @@ using DotNet.Testcontainers.Builders;
 using financial_control.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
 using Testcontainers.RabbitMq;
 using RabbitMQ.Client;
 using Moq;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc;
 
 namespace financial_control_integration_test.Configuration;
 
@@ -25,12 +26,35 @@ public class ApiFactory : WebApplicationFactory<IInitialProject>, IAsyncLifetime
 
     public readonly string Queue = "queue-test";
     public readonly string Exchange = "exchange-test";
-    public required ConsumerService ConsumerService { get; set; }
-    public required ConnectionFactory connectionFactory { get; set; }
+    public required ConsumerService ConsumerService { get ; set; }
+
+    private ConnectionFactory? _connectionFactory;
+    public ConnectionFactory ConnectionFactory {
+        get {
+            if (_connectionFactory is null)
+                _connectionFactory = GetConnection();   
+            return _connectionFactory;
+        }
+        set {
+            _connectionFactory = value;
+        }
+    }
+    
     private Mock<ILogger<ConsumerService>> LoggerConsumer { get; set; } = new Mock<ILogger<ConsumerService>>();
+
+    private ConnectionFactory GetConnection() => new ConnectionFactory
+    {
+        Uri = new Uri(_rabbitMqContainer.GetConnectionString())
+    };
+
+    public async Task<IChannel> GetChannelAsync()
+    {
+        var connection = await ConnectionFactory.CreateConnectionAsync();
+        return await connection.CreateChannelAsync();
+    }
+
     public async Task InitializeAsync()
     {
-        
         await _rabbitMqContainer.StartAsync();
         ConsumerService = new ConsumerService(
             LoggerConsumer.Object,
@@ -38,7 +62,8 @@ public class ApiFactory : WebApplicationFactory<IInitialProject>, IAsyncLifetime
                 _rabbitMqContainer.GetConnectionString(),
                 Queue,
                 Exchange
-            )
+            ),
+            null
         );
     }
 
@@ -48,12 +73,8 @@ public class ApiFactory : WebApplicationFactory<IInitialProject>, IAsyncLifetime
 
         builder.ConfigureTestServices(services =>
         {
-            var connectionFactory = new ConnectionFactory
-            {
-                Uri = new Uri(_rabbitMqContainer.GetConnectionString())
-            };
             var configurationConnection = new ConfigurationConnection
-            (
+    (
                 _rabbitMqContainer.GetConnectionString(),
                 Queue,
                 Exchange
@@ -73,12 +94,12 @@ public class ApiFactory : WebApplicationFactory<IInitialProject>, IAsyncLifetime
                 new PublisherService(
                     new ConfigurationConnection(_rabbitMqContainer.GetConnectionString(), Queue, Exchange),
                     new Mock<ILogger<PublisherService>>().Object,
-                    connectionFactory
+                    ConnectionFactory
                     )
                 );
 
             services.Remove<IConnectionFactory>();
-            services.AddSingleton<IConnectionFactory>(connectionFactory);
+            services.AddSingleton<IConnectionFactory>(ConnectionFactory);
         });
         builder.UseEnvironment("Testing");
         base.ConfigureWebHost(builder);

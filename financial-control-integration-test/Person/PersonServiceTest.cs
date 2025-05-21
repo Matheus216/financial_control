@@ -1,6 +1,6 @@
-using System.Net.Http.Json;
-using financial_control_infrastructure.Message;
 using financial_control_integration_test.Configuration;
+using financial_control_infrastructure.Message;
+using System.Net.Http.Json;
 
 namespace financial_control_integration_test.Person;
 
@@ -18,7 +18,9 @@ public class PersonServiceTest(ApiFactory factory)
         var client = _factory.CreateClient();
         var person = new { Name = "francisco" };
 
-        await _consumerService.QueueBind(_factory.Exchange, _factory.Queue);
+        var channel = await _factory.GetChannelAsync();
+
+        await _consumerService.QueueBind(channel);
 
         //Act
         var httpResponse = await client.PostAsJsonAsync("/api/person", person);
