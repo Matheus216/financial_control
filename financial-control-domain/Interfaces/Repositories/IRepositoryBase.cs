@@ -1,6 +1,6 @@
 namespace financial_control_domain.Interfaces.Repositories;
 
-public interface IRepositoryBase<T>
+public interface IRepositoryBase<T> where T : class
 {
     Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<T?> GetByIdAsync(long id, CancellationToken cancellationToken = default);

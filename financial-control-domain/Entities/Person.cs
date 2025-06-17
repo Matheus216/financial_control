@@ -1,8 +1,8 @@
-using System.Data.Common;
+using financial_control_domain.Interfaces.Repositories;
 
 namespace financial_control_Domain.Entities;
 
-public class Person(long id, string name)
+public class Person(long id, string name) 
 {
     public Person(string name)
         : this(0, name)
@@ -20,6 +20,5 @@ public class Person(long id, string name)
             Person { Id: long identifier } when identifier > 21 => 12,
             _ =>  throw new ArgumentException("")
         };
-
     }    
 }

@@ -5,7 +5,7 @@ using financial_control_Domain.Entities;
 
 namespace financial_control_Infrastructure.Repositories;
 
-public class RepositoryBase<T> where T : class, IRepositoryBase<T>
+public class RepositoryBase<T> : IRepositoryBase<T> where T : class
 {
     private readonly DbSet<T> _dbSet;
     private readonly DbFinancialContext _context;
