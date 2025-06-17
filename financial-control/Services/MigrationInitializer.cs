@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace financial_control.Services;
 
-
 public static class MigrationInitializer
 {
     public static void InitializeMigration(this IApplicationBuilder builder)

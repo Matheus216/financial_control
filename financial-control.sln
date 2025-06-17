@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "financial-control-domain", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "financial-control-integration-test", "financial-control-integration-test\financial-control-integration-test.csproj", "{FFF1D456-D833-44AC-B208-465A587BB6EF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "financial-control-application", "financial-control-application\financial-control-application.csproj", "{300E5790-2487-4DBA-BCCC-7D06DB8BC9D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{FFF1D456-D833-44AC-B208-465A587BB6EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFF1D456-D833-44AC-B208-465A587BB6EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFF1D456-D833-44AC-B208-465A587BB6EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{300E5790-2487-4DBA-BCCC-7D06DB8BC9D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{300E5790-2487-4DBA-BCCC-7D06DB8BC9D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{300E5790-2487-4DBA-BCCC-7D06DB8BC9D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{300E5790-2487-4DBA-BCCC-7D06DB8BC9D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
