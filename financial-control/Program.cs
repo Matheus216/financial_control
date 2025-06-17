@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Diagnostics;
-using financial_control.Services;
-using financial_control.Configuration;
 using financial_control_infrastructure.Configuration;
+using financial_control.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 

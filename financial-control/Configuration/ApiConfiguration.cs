@@ -1,10 +1,9 @@
-using financial_control.Infrastructure.Context;
-using financial_control.Services;
-using financial_control_application.Services;
 using financial_control_domain.Interfaces.Repositories;
 using financial_control_domain.Interfaces.Services;
-using financial_control_infrastructure.Message;
 using financial_control_infrastructure.Repositories;
+using financial_control.Infrastructure.Context;
+using financial_control_infrastructure.Message;
+using financial_control_application.Services;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 

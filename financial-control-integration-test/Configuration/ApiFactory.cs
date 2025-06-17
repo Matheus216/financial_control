@@ -57,15 +57,15 @@ public class ApiFactory : WebApplicationFactory<IApiConfiguration>, IAsyncLifeti
     public async Task InitializeAsync()
     {
         await _rabbitMqContainer.StartAsync();
-        ConsumerService = new ConsumerService(
-            LoggerConsumer.Object,
-            new ConfigurationConnection(
-                _rabbitMqContainer.GetConnectionString(),
-                Queue,
-                Exchange
-            ),
-            new PersonService(PersonRepositoryMock.Object)
-        );
+        // ConsumerService = new ConsumerService(
+        //     LoggerConsumer.Object,
+        //     new ConfigurationConnection(
+        //         _rabbitMqContainer.GetConnectionString(),
+        //         Queue,
+        //         Exchange
+        //     ),
+        //     new PersonService(PersonRepositoryMock.Object)
+        // );
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -75,7 +75,7 @@ public class ApiFactory : WebApplicationFactory<IApiConfiguration>, IAsyncLifeti
         builder.ConfigureTestServices(services =>
         {
             var configurationConnection = new ConfigurationConnection
-    (
+            (
                 _rabbitMqContainer.GetConnectionString(),
                 Queue,
                 Exchange
@@ -102,7 +102,15 @@ public class ApiFactory : WebApplicationFactory<IApiConfiguration>, IAsyncLifeti
             services.Remove<IConnectionFactory>();
             services.AddSingleton<IConnectionFactory>(ConnectionFactory);
 
-
+            ConsumerService = new ConsumerService(
+                LoggerConsumer.Object,
+                new ConfigurationConnection(
+                    _rabbitMqContainer.GetConnectionString(),
+                    Queue,
+                    Exchange
+                ),
+                services.BuildServiceProvider()
+            );
         });
         builder.UseEnvironment("Testing");
         base.ConfigureWebHost(builder);

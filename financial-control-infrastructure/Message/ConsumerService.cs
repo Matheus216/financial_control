@@ -3,17 +3,17 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client;
 using System.Text;
-using financial_control_domain.Interfaces.Services;
-using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 using financial_control_domain.Models;
+using financial_control_domain.Interfaces.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace financial_control_infrastructure.Message;
 
 public class ConsumerService(
     ILogger<ConsumerService> logger, 
     ConfigurationConnection configurationConnection,
-    IPersonService personService
+    IServiceProvider serviceProvider
 ) : BackgroundService
 {
 
@@ -118,7 +118,15 @@ public class ConsumerService(
                 var message = Encoding.UTF8.GetString(body);
 
                 _logger.LogInformation($"Message received: {message}");
-                return personService.CreateAsync(JsonSerializer.Deserialize<PersonModel>(message) ?? throw new JsonException(""));
+                using var scope = serviceProvider.CreateAsyncScope();
+                var personService = scope.ServiceProvider.GetService<IPersonService>();
+
+                ArgumentNullException.ThrowIfNull(personService);
+
+                return personService.CreateAsync(
+                    JsonSerializer.Deserialize<PersonModel>(message)
+                        ?? throw new JsonException("")
+                );
             }
             catch (Exception ex)
             {
