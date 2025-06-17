@@ -4,5 +4,5 @@ namespace financial_control_domain.Interfaces.Services;
 
 public interface IPersonService
 {
-    Task<PersonModel> Create(PersonModel person);
+    Task<PersonModel> CreateAsync(PersonModel person, CancellationToken cancellationToken = default);
 }

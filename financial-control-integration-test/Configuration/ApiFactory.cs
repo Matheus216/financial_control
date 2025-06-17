@@ -1,7 +1,8 @@
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using financial_control_domain.Interfaces.Repositories;
 using financial_control.Infrastructure.Context;
 using financial_control_infrastructure.Message;
 using Microsoft.Extensions.DependencyInjection;
+using financial_control_application.Services;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.AspNetCore.Mvc.Testing;
 using DotNet.Testcontainers.Builders;
@@ -13,11 +14,10 @@ using Microsoft.Extensions.Logging;
 using Testcontainers.RabbitMq;
 using RabbitMQ.Client;
 using Moq;
-using Microsoft.AspNetCore.Mvc;
 
 namespace financial_control_integration_test.Configuration;
 
-public class ApiFactory : WebApplicationFactory<IInitialProject>, IAsyncLifetime
+public class ApiFactory : WebApplicationFactory<IApiConfiguration>, IAsyncLifetime
 {
     private readonly RabbitMqContainer _rabbitMqContainer =
         new RabbitMqBuilder()
@@ -28,11 +28,12 @@ public class ApiFactory : WebApplicationFactory<IInitialProject>, IAsyncLifetime
     public readonly string Exchange = "exchange-test";
     public required ConsumerService ConsumerService { get ; set; }
 
+    private readonly Mock<IPersonRepository> PersonRepositoryMock = new();
+
     private ConnectionFactory? _connectionFactory;
     public ConnectionFactory ConnectionFactory {
         get {
-            if (_connectionFactory is null)
-                _connectionFactory = GetConnection();   
+            _connectionFactory ??= GetConnection();   
             return _connectionFactory;
         }
         set {
@@ -63,7 +64,7 @@ public class ApiFactory : WebApplicationFactory<IInitialProject>, IAsyncLifetime
                 Queue,
                 Exchange
             ),
-            null
+            new PersonService(PersonRepositoryMock.Object)
         );
     }
 
@@ -100,6 +101,8 @@ public class ApiFactory : WebApplicationFactory<IInitialProject>, IAsyncLifetime
 
             services.Remove<IConnectionFactory>();
             services.AddSingleton<IConnectionFactory>(ConnectionFactory);
+
+
         });
         builder.UseEnvironment("Testing");
         base.ConfigureWebHost(builder);

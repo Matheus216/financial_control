@@ -13,7 +13,7 @@ namespace financial_control_infrastructure.Message;
 public class ConsumerService(
     ILogger<ConsumerService> logger, 
     ConfigurationConnection configurationConnection,
-    IServiceProvider? _serviceProvider 
+    IPersonService personService
 ) : BackgroundService
 {
 
@@ -21,7 +21,6 @@ public class ConsumerService(
         new ConnectionFactory { Uri = new Uri(configurationConnection.ConnectionString) };
     private readonly ConfigurationConnection _configurationConnection = configurationConnection;
     private readonly ILogger<ConsumerService> _logger = logger;
-    private readonly IServiceProvider? _serviceProvider = _serviceProvider; 
 
     public async Task QueueBind(IChannel channel)
     {
@@ -118,10 +117,8 @@ public class ConsumerService(
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
 
-                using var scope = _serviceProvider!.CreateAsyncScope();
-                var personService = scope.ServiceProvider.GetRequiredService<IPersonService>();
                 _logger.LogInformation($"Message received: {message}");
-                return personService.Create(JsonSerializer.Deserialize<PersonModel>(message) ?? throw new JsonException(""));
+                return personService.CreateAsync(JsonSerializer.Deserialize<PersonModel>(message) ?? throw new JsonException(""));
             }
             catch (Exception ex)
             {
