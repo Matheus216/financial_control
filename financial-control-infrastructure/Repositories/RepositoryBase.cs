@@ -2,18 +2,20 @@ using financial_control_domain.Interfaces.Repositories;
 using financial_control.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using financial_control_Domain.Entities;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace financial_control_Infrastructure.Repositories;
 
-public class RepositoryBase<T> : IRepositoryBase<T> where T : class
+public class RepositoryBase<T> 
+    : IRepositoryBase<T> where T : class
 {
     private readonly DbSet<T> _dbSet;
     private readonly DbFinancialContext _context;
 
-    public RepositoryBase(DbFinancialContext context)
+    public RepositoryBase(IDbContextFactory<DbFinancialContext> factory)
     {
-        _dbSet = context.Set<T>();
-        _context = context;
+        _context = factory.CreateDbContext();
+        _dbSet = _context.Set<T>();
     }
 
     public async Task<IEnumerable<T>> GetAllAsync(

@@ -1,4 +1,5 @@
 using financial_control_domain.Models;
+using financial_control_Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 

@@ -12,7 +12,7 @@ public static class InfraConfiguration
         this IServiceCollection services
     )
     {
-        services.AddDbContext<DbFinancialContext>();
+        services.AddDbContextFactory<DbFinancialContext>();
         return services;
     }
     public static IServiceCollection ConfigureMessaging(

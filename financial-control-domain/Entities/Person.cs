@@ -1,18 +1,13 @@
-using financial_control_domain.Interfaces.Repositories;
 
 namespace financial_control_Domain.Entities;
 
-public class Person(long id, string name) 
+public record Person(long Id, string Name) 
 {
     public Person(string name)
         : this(0, name)
     {
         Name = name;
     }
-
-    public long Id { get; private set; } = id;
-    public string Name { get; private set; } = name;
-
     public static void CalculeAge(Person request)
     {
         var result = request switch

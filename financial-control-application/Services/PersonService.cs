@@ -1,7 +1,6 @@
 using financial_control_domain.Interfaces.Repositories;
 using financial_control_domain.Interfaces.Services;
 using financial_control_domain.Models;
-using financial_control_Domain.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace financial_control_application.Services;
@@ -18,7 +17,7 @@ public class PersonService(
     {
         try
         {
-            await repository.InsertAsync(new Person(person.Name), cancellationToken);
+            await repository.InsertAsync(person, cancellationToken);
         }
         catch (System.Exception ex)
         {
