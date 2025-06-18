@@ -1,24 +1,24 @@
-using financial_control_domain.Models;
-using financial_control_Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using financial_control_domain.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace financial_control.Infrastructure.Context;
 
-public class DbFinancialContext : DbContext
+public class DbFinancialContext(
+    IConfiguration configuration,
+    ILogger<DbFinancialContext> logger
+) : DbContext
 {
-    private readonly IConfiguration? _configuration;
+    private readonly IConfiguration? _configuration = configuration;
 
-    public DbFinancialContext(IConfiguration configuration)
+    protected override void OnConfiguring(DbContextOptionsBuilder options )
     {
-        _configuration = configuration;
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-    {
-        options.UseNpgsql(_configuration is null 
-            ?   "Host=postgres;Port=5432;Database=DbFinancial;Username=admin;Password=admin"
-            :  _configuration.GetConnectionString("DbFinancial") );
+        ArgumentNullException.ThrowIfNull(_configuration);
+        logger.LogInformation("Building migration... conection string: {C}", _configuration.GetConnectionString("DbFinancial"));
+        options
+            .UseNpgsql(_configuration.GetConnectionString("DbFinancial"))
+            .UseLowerCaseNamingConvention();
     }
 
     public DbSet<FinancialModel> Financial { get; set; }
