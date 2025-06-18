@@ -36,7 +36,7 @@ public static class InfraConfiguration
         };
 
         services.AddSingleton<IConnectionFactory>(connectionFactory);
-
+        
         return services;
     }
 }

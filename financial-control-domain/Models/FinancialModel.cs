@@ -8,5 +8,5 @@ public class FinancialModel
     public short Type { get; set; }
     public long PersonId { get; set; }
     public string Description { get; set; } = string.Empty;
-    public PersonModel Person { get; set; } = new PersonModel();
+    public PersonModel? Person { get; set; }
 }

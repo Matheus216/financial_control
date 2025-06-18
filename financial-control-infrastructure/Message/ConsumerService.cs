@@ -41,6 +41,8 @@ public class ConsumerService(
             exchange: _configurationConnection.exchangeName,
             routingKey: string.Empty
         );
+
+        _logger.LogInformation("Bind maked");
     }
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

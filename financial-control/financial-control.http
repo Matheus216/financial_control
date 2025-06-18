@@ -19,3 +19,7 @@ POST {{devsFour}}
 Content-Type: application/x-www-form-urlencoded
 
 acao=gerar_cpf&pontuacao=trueacao=gerar_cpf&pontuacao=true
+
+###
+GET {{financial_control_HostAddress}}Person
+Accept: application/json

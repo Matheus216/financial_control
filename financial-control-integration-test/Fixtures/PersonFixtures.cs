@@ -1,9 +1,7 @@
-using financial_control.Infrastructure.Context;
-using financial_control_domain.Models;
 using financial_control_integration_test.Configuration;
-using financial_control.Configuration;
+using financial_control.Infrastructure.Context;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
+using financial_control_domain.Models;
 
 namespace financial_control_integration_test.Fixtures;
 
@@ -16,10 +14,10 @@ public class PersonFixtures
         var context = provider.GetRequiredService<DbFinancialContext>();
 
         if (create) {
-            await context.Person.AddAsync(new PersonModel { Name = "Test1" });
-            await context.Person.AddAsync(new PersonModel { Name = "Test2" });
-            await context.Person.AddAsync(new PersonModel { Name = "Test3" });
-            await context.Person.AddAsync(new PersonModel { Name = "Test4" });
+            await context.Person.AddAsync(new PersonModel (1,"Test1" ));
+            await context.Person.AddAsync(new PersonModel (1,"Test2" ));
+            await context.Person.AddAsync(new PersonModel (1,"Test3" ));
+            await context.Person.AddAsync(new PersonModel (1,"Test4" ));
             await context.SaveChangesAsync();
         }
     }

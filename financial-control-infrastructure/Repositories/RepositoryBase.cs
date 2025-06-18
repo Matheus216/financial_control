@@ -16,9 +16,17 @@ public class RepositoryBase<T> : IRepositoryBase<T> where T : class
         _context = context;
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<T>> GetAllAsync(
+        int page = 1,
+        int itemsPeerPage = 10,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await _dbSet.ToListAsync(cancellationToken);
+        return await _dbSet
+            .AsNoTracking()
+            .Skip((page - 1) * itemsPeerPage)
+            .Take(itemsPeerPage)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<T?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
