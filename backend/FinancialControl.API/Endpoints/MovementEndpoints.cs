@@ -44,6 +44,8 @@ public static class MovementEndpoints
             if (movements is null) return Results.NotFound();
 
             movements.Description = inputMovements.Description;
+            movements.Value = inputMovements.Value;
+            movements.Date = inputMovements.Date;
 
             await context.SaveChangesAsync();
             return Results.NoContent();
