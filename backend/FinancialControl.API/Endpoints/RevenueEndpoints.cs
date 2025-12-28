@@ -8,7 +8,7 @@ namespace FinancialControl.API.Endpoints;
 public static class RevenueEndpoints
 {
     private const string TAG = "Revenue";
-    public static void MapRevenueEndpoints(this WebApplication app)
+    public static RouteGroupBuilder MapRevenueEndpoints(this RouteGroupBuilder app)
     {
         app.MapGet("/revenue:list", async (ApiDbContext context, [FromQuery] int page, [FromQuery] int pageSize) =>
         {
@@ -62,5 +62,7 @@ public static class RevenueEndpoints
 
             return Results.NotFound();
         }).WithTags(TAG);
+
+        return app;
     }
 }

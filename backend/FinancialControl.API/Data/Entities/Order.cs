@@ -11,8 +11,8 @@ public class Order
 {
     [JsonIgnore]
     public Guid Id { get; set; }
-    public Guid PeopleWalletId { get; set; }
-    public PeopleWallet PeopleWallet { get; set; } = new();
+    public Guid PersonWalletId { get; set; }
+    public PersonWallet PersonWallet { get; set; } = new();
     public DateTime Date { get; set; }
     public int Quantity { get; set; }
     public decimal Price { get; set; }

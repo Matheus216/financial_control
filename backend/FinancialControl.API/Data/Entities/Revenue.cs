@@ -9,4 +9,5 @@ public class Revenue
     public string Description { get; set; } = string.Empty;
     public DateTime Date { get; set; }
     public decimal Value { get; set; }
+    public bool IsRecurrent { get; set; }
 }

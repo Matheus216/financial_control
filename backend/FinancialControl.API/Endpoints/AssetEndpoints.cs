@@ -1,3 +1,4 @@
+using FinancialControl.API.Application.Providers.BRAPI;
 using FinancialControl.API.Data;
 using FinancialControl.API.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ namespace FinancialControl.API.Endpoints;
 
 public static class AssetEndpoints
 {
-    public static void MapAssetEndpoints(this WebApplication app)
+    public static RouteGroupBuilder MapAssetEndpoints(this RouteGroupBuilder app)
     {
         app.MapGet("/assets:list", async (ApiDbContext context, [FromQuery] int page, [FromQuery] int pageSize) =>
         {
@@ -43,7 +44,7 @@ public static class AssetEndpoints
             if (asset is null) return Results.NotFound();
 
             asset.Description = inputAsset.Description;
-            asset.Code = inputAsset.Code;
+            asset.Ticker = inputAsset.Ticker;
             asset.Type = inputAsset.Type;
 
             await context.SaveChangesAsync();
@@ -61,5 +62,24 @@ public static class AssetEndpoints
 
             return Results.NotFound();
         }).WithTags("Asset");
+
+        app.MapGet("/pull-actual-informations/{ticker}", 
+            async (ApiDbContext context, [FromServices] IBRAPI brapi, [FromRoute] string ticker) =>
+            {
+                var response = await brapi.GetCompactAssetByTicketAsync(ticker); 
+
+                if (response is null)
+                {
+                    return Results.NotFound(); 
+                }
+
+                context.Assets.Add(response); 
+                await context.SaveChangesAsync();
+
+                return Results.Ok("Ticket added as success");
+
+            }).WithTags("Asset");
+        
+        return app;
     }
 }

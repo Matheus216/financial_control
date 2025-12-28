@@ -7,7 +7,7 @@ namespace FinancialControl.API.Endpoints;
 
 public static class OrderEndpoints
 {
-    public static void MapOrderEndpoints(this WebApplication app)
+    public static RouteGroupBuilder MapOrderEndpoints(this RouteGroupBuilder app)
     {
         app.MapGet("/orders:list", async (ApiDbContext context, [FromQuery] int page, [FromQuery] int pageSize) =>
         {
@@ -42,7 +42,7 @@ public static class OrderEndpoints
 
             if (order is null) return Results.NotFound();
 
-            order.PeopleWalletId = inputOrder.PeopleWalletId;
+            order.PersonWalletId = inputOrder.PersonWalletId;
             order.Date = inputOrder.Date;
             order.Quantity = inputOrder.Quantity;
             order.Price = inputOrder.Price;
@@ -63,5 +63,7 @@ public static class OrderEndpoints
 
             return Results.NotFound();
         }).WithTags("Order");
+
+        return app;
     }
 }

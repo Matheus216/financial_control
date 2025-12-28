@@ -11,25 +11,29 @@ public class ApiDbContext : DbContext
 
     public DbSet<Asset> Assets { get; set; }
     public DbSet<Order> Orders { get; set; }
-    public DbSet<People> People { get; set; }
-    public DbSet<PeopleWallet> PeopleWallets { get; set; }
+    public DbSet<Person> Persons { get; set; }
+    public DbSet<PersonWallet> PersonWallets { get; set; }
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<WalletAsset> WalletAssets { get; set; }
 
     public DbSet<Revenue> Revenues { get; set; }
     public DbSet<Movement> Movements { get; set; }
+    public DbSet<AssetHistoricalValue> AssetHistoricalValues { get; set; }
+    public DbSet<DividendsData> DividendsData { get; set; }
+    public DbSet<CashDividend> CashDividends { get; set; }
+    public DbSet<StockDividend> StockDividends { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<PeopleWallet>()
+        modelBuilder.Entity<PersonWallet>()
             .HasKey(pw => pw.Id);
 
-        modelBuilder.Entity<PeopleWallet>()
-            .HasOne(pw => pw.People)
+        modelBuilder.Entity<PersonWallet>()
+            .HasOne(pw => pw.Person)
             .WithMany()
-            .HasForeignKey(pw => pw.PeopleId);
+            .HasForeignKey(pw => pw.PersonId);
 
-        modelBuilder.Entity<PeopleWallet>()
+        modelBuilder.Entity<PersonWallet>()
             .HasOne(pw => pw.Wallet)
             .WithMany()
             .HasForeignKey(pw => pw.WalletId);
@@ -48,8 +52,28 @@ public class ApiDbContext : DbContext
             .HasForeignKey(wa => wa.AssetId);
 
         modelBuilder.Entity<Order>()
-            .HasOne(o => o.PeopleWallet)
+            .HasOne(o => o.PersonWallet)
             .WithMany()
-            .HasForeignKey(o => o.PeopleWalletId);
+            .HasForeignKey(o => o.PersonWalletId);
+
+        modelBuilder.Entity<AssetHistoricalValue>()
+            .HasOne(o => o.Asset)
+            .WithMany(p => p.HistoricalData)
+            .HasForeignKey(o => o.AssetId);
+
+        modelBuilder.Entity<Asset>()
+            .HasOne(a => a.DividendsData)
+            .WithOne(d => d.Asset)
+            .HasForeignKey<DividendsData>(d => d.AssetId);
+
+        modelBuilder.Entity<CashDividend>()
+            .HasOne(cd => cd.DividendsData)
+            .WithMany(dd => dd.CashDividends)
+            .HasForeignKey(cd => cd.DividendsDataId);
+
+        modelBuilder.Entity<StockDividend>()
+            .HasOne(sd => sd.DividendsData)
+            .WithMany(dd => dd.StockDividends)
+            .HasForeignKey(sd => sd.DividendsDataId);
     }
 }

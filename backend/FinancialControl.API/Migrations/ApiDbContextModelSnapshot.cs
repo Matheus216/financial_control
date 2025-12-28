@@ -28,11 +28,29 @@ namespace FinancialControl.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Code")
-                        .IsRequired()
+                    b.Property<string>("Currency")
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LogoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LongName")
+                        .HasColumnType("text");
+
+                    b.Property<double>("MarketCap")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("RegularMarketPrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("ShortName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Ticker")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -42,6 +60,103 @@ namespace FinancialControl.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Assets");
+                });
+
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.AssetHistoricalValue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("AdjustedClose")
+                        .HasColumnType("double precision");
+
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("Close")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("Date")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("High")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Low")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Open")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("Volume")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
+
+                    b.ToTable("AssetHistoricalValues");
+                });
+
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.CashDividend", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ApprovedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("AssetIssued")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("DividendsDataId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("IsinCode")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Label")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastDatePrior")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double>("Rate")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("RelatedTo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DividendsDataId");
+
+                    b.ToTable("CashDividends");
+                });
+
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.DividendsData", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId")
+                        .IsUnique();
+
+                    b.ToTable("DividendsData");
                 });
 
             modelBuilder.Entity("FinancialControl.API.Data.Entities.Movement", b =>
@@ -74,7 +189,7 @@ namespace FinancialControl.API.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("PeopleWalletId")
+                    b.Property<Guid>("PersonWalletId")
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("Price")
@@ -88,33 +203,50 @@ namespace FinancialControl.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PeopleWalletId");
+                    b.HasIndex("PersonWalletId");
 
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("FinancialControl.API.Data.Entities.People", b =>
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.Person", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("BornDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CNPJ")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CPF")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
-                    b.ToTable("People");
+                    b.ToTable("Persons");
                 });
 
-            modelBuilder.Entity("FinancialControl.API.Data.Entities.PeopleWallet", b =>
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.PersonWallet", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("PeopleId")
+                    b.Property<Guid>("PersonId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("WalletId")
@@ -122,11 +254,11 @@ namespace FinancialControl.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PeopleId");
+                    b.HasIndex("PersonId");
 
                     b.HasIndex("WalletId");
 
-                    b.ToTable("PeopleWallets");
+                    b.ToTable("PersonWallets");
                 });
 
             modelBuilder.Entity("FinancialControl.API.Data.Entities.Revenue", b =>
@@ -142,12 +274,55 @@ namespace FinancialControl.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsRecurrent")
+                        .HasColumnType("boolean");
+
                     b.Property<decimal>("Value")
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
                     b.ToTable("Revenues");
+                });
+
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.StockDividend", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ApprovedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("AssetIssued")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompleteFactor")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("DividendsDataId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Factor")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("IsinCode")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Label")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastDatePrior")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DividendsDataId");
+
+                    b.ToTable("StockDividends");
                 });
 
             modelBuilder.Entity("FinancialControl.API.Data.Entities.Wallet", b =>
@@ -160,7 +335,7 @@ namespace FinancialControl.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("PeopleId")
+                    b.Property<Guid?>("PersonId")
                         .HasColumnType("uuid");
 
                     b.Property<bool>("Status")
@@ -168,7 +343,7 @@ namespace FinancialControl.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PeopleId");
+                    b.HasIndex("PersonId");
 
                     b.ToTable("Wallets");
                 });
@@ -197,22 +372,55 @@ namespace FinancialControl.API.Migrations
                     b.ToTable("WalletAssets");
                 });
 
-            modelBuilder.Entity("FinancialControl.API.Data.Entities.Order", b =>
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.AssetHistoricalValue", b =>
                 {
-                    b.HasOne("FinancialControl.API.Data.Entities.PeopleWallet", "PeopleWallet")
-                        .WithMany()
-                        .HasForeignKey("PeopleWalletId")
+                    b.HasOne("FinancialControl.API.Data.Entities.Asset", "Asset")
+                        .WithMany("HistoricalData")
+                        .HasForeignKey("AssetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PeopleWallet");
+                    b.Navigation("Asset");
                 });
 
-            modelBuilder.Entity("FinancialControl.API.Data.Entities.PeopleWallet", b =>
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.CashDividend", b =>
                 {
-                    b.HasOne("FinancialControl.API.Data.Entities.People", "People")
+                    b.HasOne("FinancialControl.API.Data.Entities.DividendsData", "DividendsData")
+                        .WithMany("CashDividends")
+                        .HasForeignKey("DividendsDataId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DividendsData");
+                });
+
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.DividendsData", b =>
+                {
+                    b.HasOne("FinancialControl.API.Data.Entities.Asset", "Asset")
+                        .WithOne("DividendsData")
+                        .HasForeignKey("FinancialControl.API.Data.Entities.DividendsData", "AssetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+                });
+
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.Order", b =>
+                {
+                    b.HasOne("FinancialControl.API.Data.Entities.PersonWallet", "PersonWallet")
                         .WithMany()
-                        .HasForeignKey("PeopleId")
+                        .HasForeignKey("PersonWalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PersonWallet");
+                });
+
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.PersonWallet", b =>
+                {
+                    b.HasOne("FinancialControl.API.Data.Entities.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -222,16 +430,27 @@ namespace FinancialControl.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("People");
+                    b.Navigation("Person");
 
                     b.Navigation("Wallet");
                 });
 
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.StockDividend", b =>
+                {
+                    b.HasOne("FinancialControl.API.Data.Entities.DividendsData", "DividendsData")
+                        .WithMany("StockDividends")
+                        .HasForeignKey("DividendsDataId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DividendsData");
+                });
+
             modelBuilder.Entity("FinancialControl.API.Data.Entities.Wallet", b =>
                 {
-                    b.HasOne("FinancialControl.API.Data.Entities.People", null)
+                    b.HasOne("FinancialControl.API.Data.Entities.Person", null)
                         .WithMany("Wallets")
-                        .HasForeignKey("PeopleId");
+                        .HasForeignKey("PersonId");
                 });
 
             modelBuilder.Entity("FinancialControl.API.Data.Entities.WalletAsset", b =>
@@ -253,7 +472,21 @@ namespace FinancialControl.API.Migrations
                     b.Navigation("Wallet");
                 });
 
-            modelBuilder.Entity("FinancialControl.API.Data.Entities.People", b =>
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.Asset", b =>
+                {
+                    b.Navigation("DividendsData");
+
+                    b.Navigation("HistoricalData");
+                });
+
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.DividendsData", b =>
+                {
+                    b.Navigation("CashDividends");
+
+                    b.Navigation("StockDividends");
+                });
+
+            modelBuilder.Entity("FinancialControl.API.Data.Entities.Person", b =>
                 {
                     b.Navigation("Wallets");
                 });

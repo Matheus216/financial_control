@@ -8,7 +8,7 @@ namespace FinancialControl.API.Endpoints;
 public static class MovementEndpoints
 {
     private const string TAG = "Movement";
-    public static void MapMovementEndpoints(this WebApplication app)
+    public static RouteGroupBuilder MapMovementEndpoints(this RouteGroupBuilder app)
     {
         app.MapGet("/movements:list", async (ApiDbContext context, [FromQuery] int page, [FromQuery] int pageSize) =>
         {
@@ -62,5 +62,7 @@ public static class MovementEndpoints
 
             return Results.NotFound();
         }).WithTags(TAG);
+
+        return app; 
     }
 }

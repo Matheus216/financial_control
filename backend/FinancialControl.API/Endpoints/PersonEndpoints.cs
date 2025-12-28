@@ -5,59 +5,61 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinancialControl.API.Endpoints;
 
-public static class PeopleEndpoints
+public static class PersonEndpoints
 {
-    public static void MapPeopleEndpoints(this WebApplication app)
+    public static RouteGroupBuilder MapPersonEndpoints(this RouteGroupBuilder app)
     {
-        app.MapGet("/people:list", async (ApiDbContext context, [FromQuery] int page, [FromQuery] int pageSize) =>
+        app.MapGet("/persons:list", async (ApiDbContext context, [FromQuery] int page, [FromQuery] int pageSize) =>
         {
             var response = await context
-                .People
+                .Persons
                 .AsNoTracking()
                 .Skip(page * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
             return response;
-        }).WithTags("People"); 
+        }).WithTags("Person"); 
         
-        app.MapGet("/people", async (ApiDbContext context) =>
-            await context.People.ToListAsync()).WithTags("People");
+        app.MapGet("/persons", async (ApiDbContext context) =>
+            await context.Persons.ToListAsync()).WithTags("Person");
 
-        app.MapGet("/people/{id}", async (ApiDbContext context, Guid id) =>
-            await context.People.FindAsync(id) is { } People
-                ? Results.Ok(People)
-                : Results.NotFound()).WithTags("People");
+        app.MapGet("/persons/{id}", async (ApiDbContext context, Guid id) =>
+            await context.Persons.FindAsync(id) is { } Person
+                ? Results.Ok(Person)
+                : Results.NotFound()).WithTags("Person");
 
-        app.MapPost("/people", async (ApiDbContext context, People People) =>
+        app.MapPost("/persons", async (ApiDbContext context, Person Person) =>
         {
-            context.People.Add(People);
+            context.Persons.Add(Person);
             await context.SaveChangesAsync();
-            return Results.Created($"/people/{People.Id}", People);
-        }).WithTags("People");
+            return Results.Created($"/persons/{Person.Id}", Person);
+        }).WithTags("Person");
 
-        app.MapPut("/people/{id}", async (ApiDbContext context, Guid id, People inputPeople) =>
+        app.MapPut("/persons/{id}", async (ApiDbContext context, Guid id, Person inputPerson) =>
         {
-            var People = await context.People.FindAsync(id);
+            var Person = await context.Persons.FindAsync(id);
 
-            if (People is null) return Results.NotFound();
+            if (Person is null) return Results.NotFound();
 
-            People.Name = inputPeople.Name;
+            Person.Name = inputPerson.Name;
 
             await context.SaveChangesAsync();
             return Results.NoContent();
-        }).WithTags("People");
+        }).WithTags("Person");
 
-        app.MapDelete("/people/{id}", async (ApiDbContext context, Guid id) =>
+        app.MapDelete("/persons/{id}", async (ApiDbContext context, Guid id) =>
         {
-            if (await context.People.FindAsync(id) is { } People)
+            if (await context.Persons.FindAsync(id) is { } Person)
             {
-                context.People.Remove(People);
+                context.Persons.Remove(Person);
                 await context.SaveChangesAsync();
-                return Results.Ok(People);
+                return Results.Ok(Person);
             }
 
             return Results.NotFound();
-        }).WithTags("People");
+        }).WithTags("Person");
+
+        return app;
     }
 }

@@ -2,14 +2,19 @@ using System.Text.Json.Serialization;
 
 namespace FinancialControl.API.Data.Entities;
 
-/// <summary>
-/// Create to make control of the historical price 
-/// </summary>
-public class AssetHistoricalPrice
+public class AssetHistoricalValue
 {
     [JsonIgnore]
     public Guid Id { get; set; }
-    public decimal Min { get; set; }
-    public decimal Max { get; set; }
-    public DateTime Date { get; set; }
+    public int Date { get; set; }
+    public double Open { get; set; }
+    public double High { get; set; }
+    public double Low { get; set; }
+    public double Close { get; set; }
+    public int Volume { get; set; }
+    public double AdjustedClose { get; set; }
+    
+    [JsonIgnore]
+    public Asset? Asset { get; set; }
+    public Guid AssetId { get; set; }
 }
