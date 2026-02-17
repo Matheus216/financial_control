@@ -1,12 +1,10 @@
+using System;
 using FinancialControl.API.Domain.Enums;
-using System.Text.Json.Serialization;
 
-namespace FinancialControl.API.Data.Entities;
+namespace FinancialControl.API.Contracts.Asset;
 
-public class Asset
+public class AssetCreateRequest()
 {
-    [JsonIgnore]
-    public Guid Id { get; set; }
     public string Description { get; set; } = string.Empty;
     public string Ticker { get; set; } = string.Empty;
     public AssetType Type { get; set; }
@@ -16,7 +14,4 @@ public class Asset
     public double RegularMarketPrice { get; set; }
     public double MarketCap { get; set; }
     public string? LogoUrl { get; set; }
-    
-    public ICollection<AssetHistoricalValue> HistoricalData { get; set; } = new List<AssetHistoricalValue>();
-    public DividendsData? DividendsData { get; set; }
 }

@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Testcontainers" Version="4.10.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.10.0" />
+    <PackageReference Include="TUnit" Version="1.15.0" />
+    <PackageReference Include="TUnit.AspNetCore" Version="1.15.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ApiConfiguration/" />
+    <Folder Include="Assets/Fixtures/" />
+    <Folder Include="Fixtures/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FinancialControl.API\FinancialControl.API.csproj" />
+  </ItemGroup>
+
+</Project>

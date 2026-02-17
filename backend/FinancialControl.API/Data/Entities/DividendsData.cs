@@ -9,8 +9,8 @@ public class DividendsData
     
     public Guid AssetId { get; set; }
     [JsonIgnore]
-    public Asset Asset { get; set; }
+    public Asset Asset { get; set; } = new(); 
     
-    public ICollection<CashDividend> CashDividends { get; set; } = new List<CashDividend>();
-    public ICollection<StockDividend> StockDividends { get; set; } = new List<StockDividend>();
+    public ICollection<CashDividend> CashDividends { get; set; } = [];
+    public ICollection<StockDividend> StockDividends { get; set; } = [];
 }

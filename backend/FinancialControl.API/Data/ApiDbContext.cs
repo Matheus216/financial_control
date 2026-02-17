@@ -17,7 +17,7 @@ public class ApiDbContext : DbContext
     public DbSet<WalletAsset> WalletAssets { get; set; }
 
     public DbSet<Revenue> Revenues { get; set; }
-    public DbSet<Movement> Movements { get; set; }
+    public DbSet<Transaction> Transactions { get; set; }
     public DbSet<AssetHistoricalValue> AssetHistoricalValues { get; set; }
     public DbSet<DividendsData> DividendsData { get; set; }
     public DbSet<CashDividend> CashDividends { get; set; }
@@ -65,6 +65,11 @@ public class ApiDbContext : DbContext
             .HasOne(a => a.DividendsData)
             .WithOne(d => d.Asset)
             .HasForeignKey<DividendsData>(d => d.AssetId);
+
+        modelBuilder.Entity<Person>()
+            .HasMany(x => x.Transactions)
+            .WithOne(x => x.Person)
+            .HasForeignKey(d => d.PersonId); 
 
         modelBuilder.Entity<CashDividend>()
             .HasOne(cd => cd.DividendsData)

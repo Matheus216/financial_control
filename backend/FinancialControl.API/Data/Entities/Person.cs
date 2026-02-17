@@ -12,4 +12,5 @@ public class Person
     public DateTime CreatedDate { get; set; }
     public DateTime UpdatedDate { get; set; }
     public IEnumerable<Wallet> Wallets { get; set; } = [];
+    public ICollection<Transaction> Transactions { get; set;} = [];
 }
