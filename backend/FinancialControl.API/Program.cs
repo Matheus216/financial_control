@@ -44,5 +44,6 @@ var apiGroup = app.MapGroup("/api")
     .MapPersonEndpoints()
     .MapWalletEndpoints()
     .MapRevenueEndpoints()
-    .MapTransactionEndpoints(); 
+    .MapTransactionEndpoints()
+    .MapSummaryEndpoints();
 app.Run();

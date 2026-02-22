@@ -15,7 +15,6 @@ public class ApiDbContext : DbContext
     public DbSet<PersonWallet> PersonWallets { get; set; }
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<WalletAsset> WalletAssets { get; set; }
-
     public DbSet<Revenue> Revenues { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<AssetHistoricalValue> AssetHistoricalValues { get; set; }
@@ -80,5 +79,12 @@ public class ApiDbContext : DbContext
             .HasOne(sd => sd.DividendsData)
             .WithMany(dd => dd.StockDividends)
             .HasForeignKey(sd => sd.DividendsDataId);
+
+        foreach (var model in modelBuilder.Model.GetEntityTypes())
+        {
+            modelBuilder
+                .Entity(model.ClrType)
+                .ToTable(model.ClrType.Name);
+        }
     }
 }

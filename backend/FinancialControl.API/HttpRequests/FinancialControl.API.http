@@ -1,0 +1,236 @@
+@API_HostAddress = http://localhost:5207
+
+### Assets
+
+# Get all assets
+GET {{API_HostAddress}}/assets
+###
+
+# Get assets with pagination
+GET {{API_HostAddress}}/assets:list?page=0&pageSize=10
+###
+
+# Get asset by id
+GET {{API_HostAddress}}/assets/00000000-0000-0000-0000-000000000000
+###
+
+# Create asset
+POST {{API_HostAddress}}/assets
+Content-Type: application/json
+
+{
+  "description": "string",
+  "code": "string",
+  "type": "string"
+}
+###
+
+# Update asset
+PUT {{API_HostAddress}}/assets/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "description": "string",
+  "code": "string",
+  "type": "string"
+}
+###
+
+# Delete asset
+DELETE {{API_HostAddress}}/assets/00000000-0000-0000-0000-000000000000
+###
+
+### Movements
+
+# Get all movements
+GET {{API_HostAddress}}/movements
+###
+
+# Get movements with pagination
+GET {{API_HostAddress}}/movements:list?page=0&pageSize=10
+###
+
+# Get movement by id
+GET {{API_HostAddress}}/movements/00000000-0000-0000-0000-000000000000
+###
+
+# Create movement
+{
+  "description": "string",
+  "value": 0,
+  "date": "2025-11-29T20:15:49.559Z"
+}
+###
+
+# Update movement
+PUT {{API_HostAddress}}/movements/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "description": "string",
+  "value": 0,
+  "date": "2025-11-29T20:15:49.559Z"
+}
+###
+
+# Delete movement
+DELETE {{API_HostAddress}}/movements/00000000-0000-0000-0000-000000000000
+###
+
+### Orders
+
+# Get all orders
+GET {{API_HostAddress}}/orders
+###
+
+# Get orders with pagination
+GET {{API_HostAddress}}/orders:list?page=0&pageSize=10
+###
+
+# Get order by id
+GET {{API_HostAddress}}/orders/00000000-0000-0000-0000-000000000000
+###
+
+# Create order
+POST {{API_HostAddress}}/orders
+Content-Type: application/json
+
+{
+  "peopleWalletId": "00000000-0000-0000-0000-000000000000",
+  "date": "2025-11-29T20:15:49.559Z",
+  "quantity": 0,
+  "price": 0,
+  "type": "string"
+}
+###
+
+# Update order
+PUT {{API_HostAddress}}/orders/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "peopleWalletId": "00000000-0000-0000-0000-000000000000",
+  "date": "2025-11-29T20:15:49.559Z",
+  "quantity": 0,
+  "price": 0,
+  "type": "string"
+}
+###
+
+# Delete order
+DELETE {{API_HostAddress}}/orders/00000000-0000-0000-0000-000000000000
+###
+
+### People
+
+# Get all people
+GET {{API_HostAddress}}/people
+###
+
+# Get people with pagination
+GET {{API_HostAddress}}/people:list?page=0&pageSize=10
+###
+
+# Get person by id
+GET {{API_HostAddress}}/people/00000000-0000-0000-0000-000000000000
+###
+
+# Create person
+POST {{API_HostAddress}}/person
+Content-Type: application/json
+
+{
+  "name": "Matheus"
+}
+###
+
+# Update person
+PUT {{API_HostAddress}}/people/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "name": "string"
+}
+###
+
+# Delete person
+DELETE {{API_HostAddress}}/people/00000000-0000-0000-0000-000000000000
+###
+
+### Revenue
+
+# Get all revenue
+GET {{API_HostAddress}}/revenue
+###
+
+# Get revenue with pagination
+GET {{API_HostAddress}}/revenue:list?page=0&pageSize=10
+###
+
+# Get revenue by id
+GET {{API_HostAddress}}/revenue/00000000-0000-0000-0000-000000000000
+###
+
+# Create revenue
+POST {{API_HostAddress}}/revenue
+Content-Type: application/json
+
+{
+  "description": "string",
+  "value": 0,
+  "date": "2025-11-29T20:15:49.559Z"
+}
+###
+
+# Update revenue
+PUT {{API_HostAddress}}/revenue/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "description": "string",
+  "value": 0,
+  "date": "2025-11-29T20:15:49.559Z"
+}
+###
+
+# Delete revenue
+DELETE {{API_HostAddress}}/revenue/00000000-0000-0000-0000-000000000000
+###
+
+### Wallets
+
+# Get all wallets
+GET {{API_HostAddress}}/wallets
+###
+
+# Get wallets with pagination
+GET {{API_HostAddress}}/wallet:list?page=0&pageSize=10
+###
+
+# Get wallet by id
+GET {{API_HostAddress}}/wallets/00000000-0000-0000-0000-000000000000
+###
+
+# Create wallet
+POST {{API_HostAddress}}/wallets
+Content-Type: application/json
+
+{
+  "description": "string",
+  "status": true
+}
+###
+
+# Update wallet
+PUT {{API_HostAddress}}/wallets/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "description": "string",
+  "status": true
+}
+###
+
+# Delete wallet
+DELETE {{API_HostAddress}}/wallets/00000000-0000-0000-0000-000000000000
+###
