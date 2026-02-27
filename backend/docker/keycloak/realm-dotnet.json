@@ -1,0 +1,54 @@
+{
+  "realm": "financial-realm",
+  "enabled": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "financial_admin"
+      },
+      {
+        "name": "financial_user"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "financial-api",
+      "name": "financial-api",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "defaultClientScopes": [
+        "roles",
+        "profile",
+        "email"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "financial",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "123456",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "admin"
+      ]
+    }
+  ]
+}
