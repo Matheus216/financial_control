@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialControl.API.Endpoints;
 
-public static class MovementEndpoints
+public class MovementEndpoints : IEndpointBase
 {
     private const string TAG = "Transaction";
-    public static RouteGroupBuilder MapTransactionEndpoints(this RouteGroupBuilder app)
+    public void Map(IEndpointRouteBuilder app)
     {
         app.MapGet("/transactions:list", async (ApiDbContext context, [FromQuery] int page, [FromQuery] int pageSize) =>
         {
@@ -62,7 +62,5 @@ public static class MovementEndpoints
 
             return Results.NotFound();
         }).WithTags(TAG);
-
-        return app; 
     }
 }

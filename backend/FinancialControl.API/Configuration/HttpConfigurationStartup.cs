@@ -29,20 +29,24 @@ public static class HttpConfigurationStartup
     public static IServiceCollection ConfigureDI(this IServiceCollection service)
     {
         service.AddScoped<IBRAPI, BRAPI>();
-        return service; 
+        service.AddScoped<FinancialControl.API.Application.Interfaces.IKeycloakService, FinancialControl.API.Application.Providers.Keycloak.KeycloakService>();
+        return service;
     }
 
     public static IServiceCollection ConfigureKeys(this IServiceCollection service, IConfiguration config)
     {
-        BRAPIConfiguration brbapi = new(); 
+        BRAPIConfiguration brbapi = new();
         AlphaVantageConfiguration alpha = new();
-        
-        config.Bind(brbapi);
-        config.Bind(alpha);
+        KeycloakConfiguration keycloak = new();
 
-        service.AddSingleton<BRAPIConfiguration>(brbapi); 
-        service.AddSingleton<AlphaVantageConfiguration>(alpha); 
+        config.Bind("BRAPI", brbapi);
+        config.Bind("AlphaVantage", alpha);
+        config.Bind("Keycloak", keycloak);
 
-        return service; 
+        service.AddSingleton<BRAPIConfiguration>(brbapi);
+        service.AddSingleton<AlphaVantageConfiguration>(alpha);
+        service.AddSingleton<KeycloakConfiguration>(keycloak);
+
+        return service;
     }
 }

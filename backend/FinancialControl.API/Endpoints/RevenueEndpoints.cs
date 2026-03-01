@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialControl.API.Endpoints;
 
-public static class RevenueEndpoints
+public class RevenueEndpoints : IEndpointBase
 {
     private const string TAG = "Revenue";
-    public static RouteGroupBuilder MapRevenueEndpoints(this RouteGroupBuilder app)
+    public void Map(IEndpointRouteBuilder app)
     {
         app.MapGet("/revenue:list", async (ApiDbContext context, [FromQuery] int page, [FromQuery] int pageSize) =>
         {
@@ -62,7 +62,5 @@ public static class RevenueEndpoints
 
             return Results.NotFound();
         }).WithTags(TAG);
-
-        return app;
     }
 }

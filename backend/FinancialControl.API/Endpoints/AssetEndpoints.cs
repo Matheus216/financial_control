@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinancialControl.API.Endpoints;
 
-public static class AssetEndpoints
+public class AssetEndpoints : IEndpointBase
 {
-    public static RouteGroupBuilder MapAssetEndpoints(this RouteGroupBuilder app)
+    public void Map(IEndpointRouteBuilder app)
     {
         app.MapGet("/assets:list", async (ApiDbContext context, [FromQuery] int page, [FromQuery] int pageSize) =>
         {
@@ -79,7 +79,5 @@ public static class AssetEndpoints
                 return Results.Ok("Ticket added as success");
 
             }).WithTags("Asset");
-        
-        return app;
     }
 }

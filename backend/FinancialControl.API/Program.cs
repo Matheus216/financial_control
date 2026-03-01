@@ -25,9 +25,10 @@ builder.Services.AddDbContext<ApiDbContext>(options =>
 builder.Services
     .ConfigureKeys(builder.Configuration)
     .ConfigureHttp(builder.Configuration)
+    .ConfigureEndpoint()
     .ConfigureDI();
 
-var app = builder.Build();
+WebApplication app = builder.Build().MapVersion1Api();
 
 if (app.Environment.IsDevelopment())
 {
@@ -37,13 +38,4 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
-
-var apiGroup = app.MapGroup("/api")
-    .MapAssetEndpoints()
-    .MapOrderEndpoints()
-    .MapPersonEndpoints()
-    .MapWalletEndpoints()
-    .MapRevenueEndpoints()
-    .MapTransactionEndpoints()
-    .MapSummaryEndpoints();
 app.Run();

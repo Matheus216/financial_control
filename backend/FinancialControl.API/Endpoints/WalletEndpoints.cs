@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace FinancialControl.API.Endpoints;
 
-public static class WalletEndpoints
+public class WalletEndpoints : IEndpointBase
 {
     private const string TAG = "Wallet"; 
 
-    public static RouteGroupBuilder MapWalletEndpoints(this RouteGroupBuilder app)
+    public void Map(IEndpointRouteBuilder app)
     {
        app.MapGet("/wallets:list", async (ApiDbContext context, [FromQuery] int page, [FromQuery] int pageSize) =>
         {
@@ -73,11 +73,9 @@ public static class WalletEndpoints
 
         app.MapPost("/wallets/add-asset", AddAssetAsync)
             .WithTags(TAG);
-
-        return app; 
     }
 
-    public static async Task<IResult> LinkWalletToPersonAsync(
+    public async Task<IResult> LinkWalletToPersonAsync(
         [FromServices] ApiDbContext dbContext, 
         [FromRoute] Guid wallet, 
         [FromRoute] Guid person, 
@@ -108,7 +106,7 @@ public static class WalletEndpoints
         return Results.Created(); 
     }
 
-    public static async Task<IResult> AddAssetAsync(
+    public async Task<IResult> AddAssetAsync(
         [FromServices] ApiDbContext context, 
         [FromBody] WalletAssetCreateViewModel request,
         CancellationToken cancellationToken

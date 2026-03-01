@@ -1,3 +1,4 @@
+using FinancialControl.API.Application.Interfaces;
 using FinancialControl.API.Data;
 using FinancialControl.API.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -5,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinancialControl.API.Endpoints;
 
-public static class PersonEndpoints
+public class PersonEndpoints : IEndpointBase
 {
-    public static RouteGroupBuilder MapPersonEndpoints(this RouteGroupBuilder app)
+    public void Map(IEndpointRouteBuilder app)
     {
         app.MapGet("/persons:list", async (ApiDbContext context, [FromQuery] int page, [FromQuery] int pageSize) =>
         {
@@ -29,23 +30,36 @@ public static class PersonEndpoints
                 ? Results.Ok(Person)
                 : Results.NotFound()).WithTags("Person");
 
-        app.MapPost("/persons", async (ApiDbContext context, Person Person) =>
+        app.MapPost("/persons", async (IKeycloakService service, ApiDbContext context, PersonCreateRequest request) =>
         {
-            context.Persons.Add(Person);
+            var createdUser = await service.CreateUserAsync(request); 
+
+            var personEntity = (Person)request;
+
+            personEntity.SetId(createdUser);  
+
+            context.Persons.Add(personEntity);
+            
             await context.SaveChangesAsync();
-            return Results.Created($"/persons/{Person.Id}", Person);
+            
+            return Results.Created($"/persons/{personEntity.Id}", personEntity);
+
         }).WithTags("Person");
 
-        app.MapPut("/persons/{id}", async (ApiDbContext context, Guid id, Person inputPerson) =>
+        app.MapPut("/persons/{id}", async (IKeycloakService keycloak, ApiDbContext context, Guid id, PersonUpdateRequest request) =>
         {
             var Person = await context.Persons.FindAsync(id);
 
             if (Person is null) return Results.NotFound();
 
-            Person.Name = inputPerson.Name;
+            await keycloak.UpdateUserAsync(id, request);
+
+            context.Persons.Update((Person)request);  
 
             await context.SaveChangesAsync();
+
             return Results.NoContent();
+
         }).WithTags("Person");
 
         app.MapDelete("/persons/{id}", async (ApiDbContext context, Guid id) =>
@@ -60,6 +74,5 @@ public static class PersonEndpoints
             return Results.NotFound();
         }).WithTags("Person");
 
-        return app;
     }
 }

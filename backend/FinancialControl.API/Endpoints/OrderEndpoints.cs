@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinancialControl.API.Endpoints;
 
-public static class OrderEndpoints
+public class OrderEndpoints : IEndpointBase
 {
-    public static RouteGroupBuilder MapOrderEndpoints(this RouteGroupBuilder app)
+    public void Map(IEndpointRouteBuilder app)
     {
         app.MapGet("/orders:list", async (ApiDbContext context, [FromQuery] int page, [FromQuery] int pageSize) =>
         {
@@ -63,7 +63,5 @@ public static class OrderEndpoints
 
             return Results.NotFound();
         }).WithTags("Order");
-
-        return app;
     }
 }
