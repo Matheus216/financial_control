@@ -400,3 +400,4 @@ FodyWeavers.xsd
 *.sln.iml
 backend/FinancialControl.API/appsettings.Development.json
 **/appsettings.Development.json
+backend/FinancialControl.API/appsettings.Development.json

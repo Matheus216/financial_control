@@ -31,6 +31,7 @@ public class Person : PersonBase
     {
         return new()
         {
+            Id = new Guid(),
             CPF = request.CPF,
             CreatedDate = DateTime.Now,
             FirstName = request.FirstName,

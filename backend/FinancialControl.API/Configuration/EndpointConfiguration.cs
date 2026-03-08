@@ -24,7 +24,7 @@ public static class EndpointConfiguration
         var endpoints = app.Services.GetServices<IEndpointBase>();
 
         RouteGroupBuilder versionedGroup = app
-            .MapGroup("api/v{version:apiVersion}");
+            .MapGroup("api/v1");
 
         foreach (var service in endpoints)
         {

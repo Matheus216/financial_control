@@ -5,6 +5,7 @@ namespace FinancialControl.API.Data.Entities;
 
 public abstract class TransactionBase
 {
+    [JsonIgnore]
     public Guid PersonId { get; set; }
     public string Description { get; set; } = string.Empty;
     public decimal Value { get; set; }
@@ -12,6 +13,11 @@ public abstract class TransactionBase
     public DateTime ExpirationDate { get; set; }
     public bool IsRecurring { get; set; }
     public TransactionType TransactionType { get; set; }
+
+    public void SetPersonId(Guid personId)
+    {
+        this.PersonId = personId;
+    }
 }
 
 

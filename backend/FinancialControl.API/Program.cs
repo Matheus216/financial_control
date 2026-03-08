@@ -1,6 +1,5 @@
 using FinancialControl.API.Configuration;
 using FinancialControl.API.Data;
-using FinancialControl.API.Endpoints;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +21,19 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<ApiDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+var keycloakSection = builder.Configuration.GetSection("keycloak"); 
+
 builder.Services
+    .AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority =  keycloakSection["Authority"];
+        options.Audience = keycloakSection["Audience"];
+        options.RequireHttpsMetadata = bool.Parse(keycloakSection["RequireHttpsMetadata"]!);
+    });
+
+builder.Services
+    .AddAuthorization()
     .ConfigureKeys(builder.Configuration)
     .ConfigureHttp(builder.Configuration)
     .ConfigureEndpoint()

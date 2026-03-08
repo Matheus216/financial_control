@@ -30,7 +30,12 @@ public class PersonEndpoints : IEndpointBase
                 ? Results.Ok(Person)
                 : Results.NotFound()).WithTags("Person");
 
-        app.MapPost("/persons", async (IKeycloakService service, ApiDbContext context, PersonCreateRequest request) =>
+        app.MapPost("/persons", async (
+            IKeycloakService service, 
+            ApiDbContext context, 
+            PersonCreateRequest request,
+            HttpContext userContext
+        ) =>
         {
             var createdUser = await service.CreateUserAsync(request); 
 
@@ -44,7 +49,7 @@ public class PersonEndpoints : IEndpointBase
             
             return Results.Created($"/persons/{personEntity.Id}", personEntity);
 
-        }).WithTags("Person");
+        }).WithTags("Person").RequireAuthorization();
 
         app.MapPut("/persons/{id}", async (IKeycloakService keycloak, ApiDbContext context, Guid id, PersonUpdateRequest request) =>
         {
@@ -52,7 +57,7 @@ public class PersonEndpoints : IEndpointBase
 
             if (Person is null) return Results.NotFound();
 
-            await keycloak.UpdateUserAsync(id, request);
+            await keycloak.UpdateUserAsync(Person.Id, request);
 
             context.Persons.Update((Person)request);  
 

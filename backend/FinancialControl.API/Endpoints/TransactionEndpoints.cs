@@ -30,11 +30,18 @@ public class MovementEndpoints : IEndpointBase
                 ? Results.Ok(transactions)
                 : Results.NotFound()).WithTags(TAG);
 
-        app.MapPost("/transactions", async (ApiDbContext context, TransactionRequest transactions) =>
+        app.MapPost("/transactions", async (
+            ApiDbContext context, 
+            TransactionRequest transaction,
+            HttpContext userContext
+
+        ) =>
         {
-            var createdTransaction = context.Transactions.Add((Transaction)transactions);
+            transaction.SetPersonId(Guid.Parse(userContext.User.FindFirst("sub")!.Value)); 
+
+            var createdTransaction = context.Transactions.Add((Transaction)transaction);
             await context.SaveChangesAsync();
-            return Results.Created($"/transactions/{createdTransaction.Entity.Id}", transactions);
+            return Results.Created($"/transactions/{createdTransaction.Entity.Id}", transaction);
         }).WithTags(TAG);
 
         app.MapPut("/transactions/{id}", async (ApiDbContext context, Guid id, Transaction inputMovements) =>
